@@ -411,6 +411,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Welcome,'**
   String get welcomeMessage;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @farmDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm Details'**
+  String get farmDetails;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @saveFarmChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Farm Changes'**
+  String get saveFarmChanges;
+
+  /// No description provided for @logOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Out'**
+  String get logOut;
+
+  /// No description provided for @selectLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Language'**
+  String get selectLanguage;
+
+  /// No description provided for @detailsUpdatedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Details updated successfully!'**
+  String get detailsUpdatedMessage;
 }
 
 class _AppLocalizationsDelegate

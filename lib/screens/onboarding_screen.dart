@@ -1,3 +1,4 @@
+import 'package:agrisense/providers/farm_data_provider.dart';
 import 'package:agrisense/providers/language_provider.dart';
 import 'package:agrisense/screens/dashboard_screen.dart';
 import 'package:agrisense/theme/app_theme.dart';
@@ -22,17 +23,14 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _formKey = GlobalKey<FormState>();
-
-  // --- Controllers for all form fields ---
   final TextEditingController _languageSearchController = TextEditingController();
   final TextEditingController _cropSearchController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _lengthController = TextEditingController();
   final TextEditingController _breadthController = TextEditingController();
   final TextEditingController _rowsController = TextEditingController();
-  final TextEditingController _plantsPerRowController = TextEditingController(); // From Code 2
+  final TextEditingController _plantsPerRowController = TextEditingController();
 
-  // --- State for Dropdowns ---
   final List<Language> _languages = [
     Language('en', 'English'),
     Language('hi', 'हिन्दी (Hindi)'),
@@ -49,7 +47,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     Language('as', 'অসমীয়া (Assamese)'),
   ];
   Language? _selectedLanguage;
-  String? _selectedCrop;
+  
+  // Store the language-independent key for the crop
+  String? _selectedCropKey;
+  final List<String> _cropKeys = ['wheat', 'maize', 'corn', 'tomato', 'potato'];
 
   @override
   void initState() {
@@ -64,7 +65,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   void dispose() {
-    // Dispose all controllers
     _languageSearchController.dispose();
     _cropSearchController.dispose();
     _nameController.dispose();
@@ -74,26 +74,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _plantsPerRowController.dispose();
     super.dispose();
   }
-  
-  // --- Dataflow logic from Code 2 ---
+
   void _createFarmProfile() {
     if (_formKey.currentState!.validate()) {
+      final farmDataProvider = Provider.of<FarmDataProvider>(context, listen: false);
       final farmData = {
         'name': _nameController.text,
-        'cropType': _selectedCrop,
+        'cropTypeKey': _selectedCropKey, // Save the neutral key
         'farmLength': double.tryParse(_lengthController.text) ?? 0.0,
         'farmBreadth': double.tryParse(_breadthController.text) ?? 0.0,
         'rows': int.tryParse(_rowsController.text) ?? 0,
         'plantsPerRow': int.tryParse(_plantsPerRowController.text) ?? 0,
-        'selectedLanguage': _selectedLanguage?.name,
       };
+
+      farmDataProvider.updateFarmData(farmData);
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          // Pass the collected data to the Dashboard
-          builder: (context) => DashboardScreen(farmData: farmData),
-        ),
+        MaterialPageRoute(builder: (context) => const DashboardScreen()),
       );
     }
   }
@@ -103,13 +101,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Consumer<LanguageProvider>(
       builder: (context, languageProvider, child) {
         final localizations = AppLocalizations.of(context)!;
-        final List<String> translatedCrops = [
-          localizations.cropWheat,
-          localizations.cropMaize,
-          localizations.cropCorn,
-          localizations.cropTomato,
-          localizations.cropPotato,
-        ];
+        
+        // Create a map of keys to translated names for the dropdown
+        final Map<String, String> translatedCrops = {
+          'wheat': localizations.cropWheat,
+          'maize': localizations.cropMaize,
+          'corn': localizations.cropCorn,
+          'tomato': localizations.cropTomato,
+          'potato': localizations.cropPotato,
+        };
 
         return Scaffold(
           body: SafeArea(
@@ -119,7 +119,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 40),
-                  // --- UI from Code 1 ---
                   const Text('AgriSense', textAlign: TextAlign.center, style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
                   const SizedBox(height: 24),
                   Text(localizations.onboardingTitle, textAlign: TextAlign.center, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
@@ -136,9 +135,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   _buildForm(localizations, translatedCrops),
                   const SizedBox(height: 32),
                   ElevatedButton.icon(
-                    onPressed: _createFarmProfile, // Use dataflow logic from Code 2
+                    onPressed: _createFarmProfile,
                     icon: const Icon(Icons.check_circle_outline),
-                    label: Text(localizations.createProfile), // Use text from Code 1
+                    label: Text(localizations.createProfile),
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -150,7 +149,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildForm(AppLocalizations localizations, List<String> translatedCrops) {
+  Widget _buildForm(AppLocalizations localizations, Map<String, String> translatedCrops) {
     return Form(
       key: _formKey,
       child: Column(
@@ -198,7 +197,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             validator: (value) => value!.isEmpty ? 'Enter number of rows' : null,
           ),
           const SizedBox(height: 16),
-          // --- "Plants per Row" field from Code 2 ---
           _buildTextFormField(
             controller: _plantsPerRowController,
             hintText: localizations.plantsPerRow,
@@ -229,15 +227,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // --- Searchable Crop Dropdown from Code 1 ---
-  Widget _buildCropDropdown(AppLocalizations localizations, List<String> cropList) {
+  Widget _buildCropDropdown(AppLocalizations localizations, Map<String, String> translatedCrops) {
     return DropdownButtonHideUnderline(
       child: DropdownButton2<String>(
         isExpanded: true,
         hint: Text(localizations.selectCropType, style: TextStyle(fontSize: 14, color: Theme.of(context).hintColor)),
-        items: cropList.map((String item) => DropdownMenuItem<String>(value: item, child: Text(item, style: const TextStyle(fontSize: 14)))).toList(),
-        value: _selectedCrop,
-        onChanged: (String? value) => setState(() => _selectedCrop = value),
+        items: translatedCrops.entries.map((entry) {
+          return DropdownMenuItem<String>(
+            value: entry.key,
+            child: Text(entry.value, style: const TextStyle(fontSize: 14)),
+          );
+        }).toList(),
+        value: _selectedCropKey,
+        onChanged: (String? value) {
+          setState(() {
+            _selectedCropKey = value;
+          });
+        },
         buttonStyleData: ButtonStyleData(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           height: 50,
@@ -264,7 +270,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ),
-          searchMatchFn: (item, searchValue) => item.value.toString().toLowerCase().contains(searchValue.toLowerCase()),
+          searchMatchFn: (item, searchValue) {
+            // Compare search value against the display text (child widget)
+            final textChild = item.child as Text;
+            return textChild.data.toString().toLowerCase().contains(searchValue.toLowerCase());
+          },
         ),
         onMenuStateChange: (isOpen) {
           if (!isOpen) _cropSearchController.clear();
@@ -273,7 +283,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // --- Searchable Language Dropdown from Code 1 ---
   Widget _buildLanguageDropdown() {
     final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
     return DropdownButtonHideUnderline(
@@ -285,7 +294,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           if (language != null) {
             setState(() {
               _selectedLanguage = language;
-              _selectedCrop = null;
+              _selectedCropKey = null; // Clear selected crop when language changes
             });
             languageProvider.changeLanguage(Locale(language.code));
           }

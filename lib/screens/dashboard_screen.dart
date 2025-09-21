@@ -1,16 +1,16 @@
+import 'package:agrisense/providers/farm_data_provider.dart';
 import 'package:agrisense/screens/farm_map_screen.dart';
 import 'package:agrisense/screens/health_report_screen.dart';
 import 'package:agrisense/screens/plant_scan_screen.dart';
+import 'package:agrisense/screens/settings_screen.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:agrisense/theme/app_theme.dart';
+import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 
 class DashboardScreen extends StatefulWidget {
-  final Map<String, dynamic> farmData;
-
-  const DashboardScreen({super.key, required this.farmData});
-
+  const DashboardScreen({super.key});
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
@@ -22,29 +22,69 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
+    final farmData = Provider.of<FarmDataProvider>(context).farmData;
 
     return Scaffold(
       appBar: CustomAppBar(
-        // CHANGE: The title now shows a personalized greeting.
-        title: '${localizations.welcomeMessage} ${widget.farmData['name']}!',
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.home_outlined, size: 28.0),
+          ),
+        ),
+        title: '${localizations.welcomeMessage} ${farmData['name'] ?? ''}!',
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
+              },
+              icon: const Icon(Icons.settings_outlined, size: 28.0),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildFarmSummaryCard(localizations),
+            _buildFarmSummaryCard(localizations, farmData),
             const SizedBox(height: 24),
             _buildSmartControlsCard(localizations),
             const SizedBox(height: 24),
-            _buildNavigationButtons(localizations),
+            _buildNavigationButtons(localizations, farmData),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildFarmSummaryCard(AppLocalizations localizations) {
+  Widget _buildFarmSummaryCard(AppLocalizations localizations, Map<String, dynamic> farmData) {
+    String cropDisplay = 'N/A';
+    final String? cropKey = farmData['cropTypeKey'];
+    if (cropKey != null) {
+      switch (cropKey) {
+        case 'wheat':
+          cropDisplay = localizations.cropWheat;
+          break;
+        case 'maize':
+          cropDisplay = localizations.cropMaize;
+          break;
+        case 'corn':
+          cropDisplay = localizations.cropCorn;
+          break;
+        case 'tomato':
+          cropDisplay = localizations.cropTomato;
+          break;
+        case 'potato':
+          cropDisplay = localizations.cropPotato;
+          break;
+      }
+    }
+
     return Card(
       elevation: 2,
       shadowColor: AppTheme.primaryColor.withOpacity(0.1),
@@ -57,28 +97,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              localizations.farmSummary,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            Text(localizations.farmSummary, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-            _buildSummaryRow(
-              Icons.eco_outlined,
-              localizations.crop,
-              '${widget.farmData['cropType']}',
-            ),
+            _buildSummaryRow(Icons.eco_outlined, localizations.crop, cropDisplay),
             const SizedBox(height: 12),
-            _buildSummaryRow(
-              Icons.aspect_ratio_outlined,
-              localizations.area,
-              '${widget.farmData['farmLength']}m × ${widget.farmData['farmBreadth']}m',
-            ),
+            _buildSummaryRow(Icons.aspect_ratio_outlined, localizations.area, '${farmData['farmLength'] ?? 0}m × ${farmData['farmBreadth'] ?? 0}m'),
             const SizedBox(height: 12),
-            _buildSummaryRow(
-              Icons.format_list_numbered,
-              localizations.rows,
-              '${widget.farmData['rows']}',
-            ),
+            _buildSummaryRow(Icons.format_list_numbered, localizations.rows, '${farmData['rows'] ?? 0}'),
           ],
         ),
       ),
@@ -90,10 +115,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: [
         Icon(icon, color: AppTheme.primaryColor, size: 20),
         const SizedBox(width: 12),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 16, color: AppTheme.subTextColor),
-        ),
+        Text(title, style: const TextStyle(fontSize: 16, color: AppTheme.subTextColor)),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
@@ -119,10 +141,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              localizations.smartControls,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            Text(localizations.smartControls, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             _buildControlRow(
               icon: Icons.precision_manufacturing_outlined,
@@ -136,8 +155,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               icon: Icons.water_drop_outlined,
               label: localizations.sprinklerSystem,
               isActive: isSprinklerActive,
-              onToggle: () =>
-                  setState(() => isSprinklerActive = !isSprinklerActive),
+              onToggle: () => setState(() => isSprinklerActive = !isSprinklerActive),
               localizations: localizations,
             ),
           ],
@@ -157,10 +175,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: [
         Icon(icon, color: AppTheme.primaryColor, size: 28),
         const SizedBox(width: 16),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
+        Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         const Spacer(),
         GestureDetector(
           onTap: onToggle,
@@ -173,10 +188,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             child: Text(
               isActive ? localizations.on : localizations.off,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
         ),
@@ -184,32 +196,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildNavigationButtons(AppLocalizations localizations) {
+  Widget _buildNavigationButtons(AppLocalizations localizations, Map<String, dynamic> farmData) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
           localizations.toolsAndAnalytics,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppTheme.textColor,
-          ),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textColor),
         ),
         const SizedBox(height: 16),
         OutlinedButton.icon(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FarmMapScreen(
-                  farmLength: widget.farmData['farmLength'],
-                  farmWidth: widget.farmData['farmBreadth'],
-                  rows: widget.farmData['rows'],
-                  plantsPerRow: widget.farmData['plantsPerRow'],
-                ),
-              ),
-            );
+            Navigator.push(context, MaterialPageRoute(builder: (context) => FarmMapScreen(
+              farmLength: farmData['farmLength'] ?? 0.0,
+              farmWidth: farmData['farmBreadth'] ?? 0.0,
+              rows: farmData['rows'] ?? 0,
+              plantsPerRow: farmData['plantsPerRow'] ?? 0,
+            )));
           },
           icon: const Icon(Icons.map_outlined),
           label: Text(localizations.viewFarmMap),
@@ -217,13 +220,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SizedBox(height: 12),
         OutlinedButton.icon(
           onPressed: () {
-            // This can be changed to navigate to your actual history screen later
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const HealthReportScreen(),
-              ),
-            );
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const HealthReportScreen()));
           },
           icon: const Icon(Icons.article_outlined),
           label: Text(localizations.viewPreviousReports),
@@ -231,15 +228,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SizedBox(height: 12),
         ElevatedButton.icon(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const PlantScanScreen()),
-            );
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const PlantScanScreen()));
           },
           icon: const Icon(Icons.camera_alt_outlined),
           label: Text(localizations.scanNewPlant),
           style: ElevatedButton.styleFrom(
-            // CHANGE: The button color is now the theme's primaryColor.
             backgroundColor: AppTheme.primaryColor,
             foregroundColor: Colors.white,
           ),

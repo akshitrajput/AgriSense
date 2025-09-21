@@ -166,4 +166,26 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get welcomeMessage => 'வணக்கம்,';
+
+  @override
+  String get settings => 'அமைப்புகள்';
+
+  @override
+  String get farmDetails => 'பண்ணை விவரங்கள்';
+
+  @override
+  String get language => 'மொழி';
+
+  @override
+  String get saveFarmChanges => 'மாற்றங்களைச் சேமிக்கவும்';
+
+  @override
+  String get logOut => 'வெளியேறு';
+
+  @override
+  String get selectLanguage => 'மொழியைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get detailsUpdatedMessage =>
+      'விவரங்கள் வெற்றிகரமாகப் புதுப்பிக்கப்பட்டன!';
 }

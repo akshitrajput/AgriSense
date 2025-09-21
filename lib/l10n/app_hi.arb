@@ -51,5 +51,12 @@
     "markAffected": "प्रभावित के रूप में चिह्नित करें",
     "markHealthy": "स्वस्थ के रूप में चिह्नित करें",
     "close": "बंद करें",
-    "welcomeMessage": "नमस्ते,"
+    "welcomeMessage": "नमस्ते,",
+    "settings": "सेटिंग्स",
+    "farmDetails": "खेत का विवरण",
+    "language": "भाषा",
+    "saveFarmChanges": "बदलाव सहेजें",
+    "logOut": "लॉग आउट",
+    "selectLanguage": "भाषा चुने",
+    "detailsUpdatedMessage": "विवरण सफलतापूर्वक अपडेट किया गया!"
 }

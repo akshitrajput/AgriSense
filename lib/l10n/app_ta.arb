@@ -51,5 +51,12 @@
     "markAffected": "பாதிக்கப்பட்டதாகக் குறிக்கவும்",
     "markHealthy": "ஆரோக்கியமானதாகக் குறிக்கவும்",
     "close": "மூடு",
-    "welcomeMessage": "வணக்கம்,"
-}
+    "welcomeMessage": "வணக்கம்,",
+    "settings": "அமைப்புகள்",
+    "farmDetails": "பண்ணை விவரங்கள்",
+    "language": "மொழி",
+    "saveFarmChanges": "மாற்றங்களைச் சேமிக்கவும்",
+    "logOut": "வெளியேறு",
+    "selectLanguage": "மொழியைத் தேர்ந்தெடுக்கவும்",
+    "detailsUpdatedMessage": "விவரங்கள் வெற்றிகரமாகப் புதுப்பிக்கப்பட்டன!"
+}   

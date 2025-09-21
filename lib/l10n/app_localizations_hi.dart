@@ -164,4 +164,25 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get welcomeMessage => 'नमस्ते,';
+
+  @override
+  String get settings => 'सेटिंग्स';
+
+  @override
+  String get farmDetails => 'खेत का विवरण';
+
+  @override
+  String get language => 'भाषा';
+
+  @override
+  String get saveFarmChanges => 'बदलाव सहेजें';
+
+  @override
+  String get logOut => 'लॉग आउट';
+
+  @override
+  String get selectLanguage => 'भाषा चुने';
+
+  @override
+  String get detailsUpdatedMessage => 'विवरण सफलतापूर्वक अपडेट किया गया!';
 }

@@ -164,4 +164,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get welcomeMessage => 'Welcome,';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get farmDetails => 'Farm Details';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get saveFarmChanges => 'Save Farm Changes';
+
+  @override
+  String get logOut => 'Log Out';
+
+  @override
+  String get selectLanguage => 'Select Language';
+
+  @override
+  String get detailsUpdatedMessage => 'Details updated successfully!';
 }

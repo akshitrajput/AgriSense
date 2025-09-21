@@ -51,5 +51,12 @@
     "markAffected": "Mark as Affected",
     "markHealthy": "Mark as Healthy",
     "close": "Close",
-    "welcomeMessage": "Welcome,"
+    "welcomeMessage": "Welcome,",
+    "settings": "Settings",
+    "farmDetails": "Farm Details",
+    "language": "Language",
+    "saveFarmChanges": "Save Farm Changes",
+    "logOut": "Log Out",
+    "selectLanguage": "Select Language",
+    "detailsUpdatedMessage": "Details updated successfully!"
 }

@@ -1,5 +1,7 @@
+import 'package:agrisense/providers/farm_data_provider.dart';
 import 'package:agrisense/providers/language_provider.dart';
 import 'package:agrisense/screens/onboarding_screen.dart';
+import 'package:agrisense/screens/splash_screen.dart';
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
@@ -17,8 +19,13 @@ Future<void> main() async {
   runApp(
     DevicePreview(
       enabled: !kReleaseMode,
-      builder: (context) => ChangeNotifierProvider(
-        create: (context) => LanguageProvider(languageCode),
+      builder: (context) => MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => LanguageProvider(languageCode),
+          ),
+          ChangeNotifierProvider(create: (context) => FarmDataProvider()),
+        ],
         child: const AgriSenseApp(),
       ),
     ),
@@ -33,22 +40,16 @@ class AgriSenseApp extends StatelessWidget {
     return Consumer<LanguageProvider>(
       builder: (context, languageProvider, child) {
         return MaterialApp(
-          // --- DevicePreview Settings ---
           useInheritedMediaQuery: true,
-          // FIX: The duplicate 'locale' property was removed from here.
           builder: DevicePreview.appBuilder,
-          // -----------------------------
-
           title: 'AgriSense',
           theme: AppTheme.lightTheme,
           debugShowCheckedModeBanner: false,
-
-          // --- Localization Settings ---
-          locale: languageProvider.appLocale, // This is the single source of truth for the app's language.
+          locale: languageProvider.appLocale,
           supportedLocales: const [
-            Locale('en', ''), // English
+            Locale('en', ''),
             Locale('hi', ''),
-            Locale('ta', ''), // Hindi
+            Locale('ta', ''),
           ],
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -56,10 +57,8 @@ class AgriSenseApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          // ----------------------------
-
-          home: const OnboardingScreen(),
-        );  
+          home: const SplashScreen(),
+        );
       },
     );
   }
