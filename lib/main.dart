@@ -59,7 +59,7 @@ class AgriSenseApp extends StatelessWidget {
           // ----------------------------
 
           home: const OnboardingScreen(),
-        );
+        );  
       },
     );
   }

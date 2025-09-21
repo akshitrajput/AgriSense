@@ -137,4 +137,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cropPotato => 'Potato';
+
+  @override
+  String get plantsPerRow => 'Plants per Row';
+
+  @override
+  String get toolsAndAnalytics => 'Tools & Analytics';
+
+  @override
+  String get viewPreviousReports => 'View Previous Reports';
+
+  @override
+  String get scanNewPlant => 'Scan a New Plant';
+
+  @override
+  String get cropDetailsTitle => 'Crop Details';
+
+  @override
+  String get markAffected => 'Mark as Affected';
+
+  @override
+  String get markHealthy => 'Mark as Healthy';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get welcomeMessage => 'Welcome,';
 }

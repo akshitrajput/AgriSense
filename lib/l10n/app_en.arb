@@ -42,5 +42,14 @@
     "cropMaize": "Maize",
     "cropCorn": "Corn",
     "cropTomato": "Tomato",
-    "cropPotato": "Potato"
+    "cropPotato": "Potato",
+    "plantsPerRow": "Plants per Row",
+    "toolsAndAnalytics": "Tools & Analytics",
+    "viewPreviousReports": "View Previous Reports",
+    "scanNewPlant": "Scan a New Plant",
+    "cropDetailsTitle": "Crop Details",
+    "markAffected": "Mark as Affected",
+    "markHealthy": "Mark as Healthy",
+    "close": "Close",
+    "welcomeMessage": "Welcome,"
 }

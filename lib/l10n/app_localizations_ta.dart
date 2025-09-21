@@ -139,4 +139,31 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get cropPotato => 'உருளைக்கிழங்கு';
+
+  @override
+  String get plantsPerRow => 'ஒரு வரிசைக்கு தாவரங்கள்';
+
+  @override
+  String get toolsAndAnalytics => 'கருவிகள் மற்றும் பகுப்பாய்வுகள்';
+
+  @override
+  String get viewPreviousReports => 'முந்தைய அறிக்கைகளைக் காண்க';
+
+  @override
+  String get scanNewPlant => 'ஒரு புதிய தாவரத்தை ஸ்கேன் செய்யுங்கள்';
+
+  @override
+  String get cropDetailsTitle => 'பயிர் விவரங்கள்';
+
+  @override
+  String get markAffected => 'பாதிக்கப்பட்டதாகக் குறிக்கவும்';
+
+  @override
+  String get markHealthy => 'ஆரோக்கியமானதாகக் குறிக்கவும்';
+
+  @override
+  String get close => 'மூடு';
+
+  @override
+  String get welcomeMessage => 'வணக்கம்,';
 }

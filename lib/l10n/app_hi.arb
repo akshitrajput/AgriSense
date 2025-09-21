@@ -42,5 +42,14 @@
     "cropMaize": "मक्का",
     "cropCorn": "भुट्टा",
     "cropTomato": "टमाटर",
-    "cropPotato": "आलू"
+    "cropPotato": "आलू",
+    "plantsPerRow": "प्रति पंक्ति पौधे",
+    "toolsAndAnalytics": "उपकरण और विश्लेषण",
+    "viewPreviousReports": "पिछली रिपोर्टें देखें",
+    "scanNewPlant": "एक नया पौधा स्कैन करें",
+    "cropDetailsTitle": "फसल का विवरण",
+    "markAffected": "प्रभावित के रूप में चिह्नित करें",
+    "markHealthy": "स्वस्थ के रूप में चिह्नित करें",
+    "close": "बंद करें",
+    "welcomeMessage": "नमस्ते,"
 }

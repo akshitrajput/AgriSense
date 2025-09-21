@@ -42,5 +42,14 @@
     "cropMaize": "மக்காச்சோளம்",
     "cropCorn": "சோளம்",
     "cropTomato": "தக்காளி",
-    "cropPotato": "உருளைக்கிழங்கு"
+    "cropPotato": "உருளைக்கிழங்கு",
+    "plantsPerRow": "ஒரு வரிசைக்கு தாவரங்கள்",
+    "toolsAndAnalytics": "கருவிகள் மற்றும் பகுப்பாய்வுகள்",
+    "viewPreviousReports": "முந்தைய அறிக்கைகளைக் காண்க",
+    "scanNewPlant": "ஒரு புதிய தாவரத்தை ஸ்கேன் செய்யுங்கள்",
+    "cropDetailsTitle": "பயிர் விவரங்கள்",
+    "markAffected": "பாதிக்கப்பட்டதாகக் குறிக்கவும்",
+    "markHealthy": "ஆரோக்கியமானதாகக் குறிக்கவும்",
+    "close": "மூடு",
+    "welcomeMessage": "வணக்கம்,"
 }

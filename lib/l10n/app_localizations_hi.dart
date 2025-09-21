@@ -137,4 +137,31 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get cropPotato => 'आलू';
+
+  @override
+  String get plantsPerRow => 'प्रति पंक्ति पौधे';
+
+  @override
+  String get toolsAndAnalytics => 'उपकरण और विश्लेषण';
+
+  @override
+  String get viewPreviousReports => 'पिछली रिपोर्टें देखें';
+
+  @override
+  String get scanNewPlant => 'एक नया पौधा स्कैन करें';
+
+  @override
+  String get cropDetailsTitle => 'फसल का विवरण';
+
+  @override
+  String get markAffected => 'प्रभावित के रूप में चिह्नित करें';
+
+  @override
+  String get markHealthy => 'स्वस्थ के रूप में चिह्नित करें';
+
+  @override
+  String get close => 'बंद करें';
+
+  @override
+  String get welcomeMessage => 'नमस्ते,';
 }

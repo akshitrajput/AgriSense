@@ -357,6 +357,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Potato'**
   String get cropPotato;
+
+  /// No description provided for @plantsPerRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Plants per Row'**
+  String get plantsPerRow;
+
+  /// No description provided for @toolsAndAnalytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Tools & Analytics'**
+  String get toolsAndAnalytics;
+
+  /// No description provided for @viewPreviousReports.
+  ///
+  /// In en, this message translates to:
+  /// **'View Previous Reports'**
+  String get viewPreviousReports;
+
+  /// No description provided for @scanNewPlant.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan a New Plant'**
+  String get scanNewPlant;
+
+  /// No description provided for @cropDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop Details'**
+  String get cropDetailsTitle;
+
+  /// No description provided for @markAffected.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Affected'**
+  String get markAffected;
+
+  /// No description provided for @markHealthy.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Healthy'**
+  String get markHealthy;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @welcomeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome,'**
+  String get welcomeMessage;
 }
 
 class _AppLocalizationsDelegate
