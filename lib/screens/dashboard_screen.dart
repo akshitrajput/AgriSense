@@ -168,7 +168,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: isActive ? AppTheme.accentColor : AppTheme.affectedColor,
+              color: isActive ? AppTheme.primaryColor : AppTheme.affectedColor,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
