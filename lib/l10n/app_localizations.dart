@@ -7,6 +7,7 @@ import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
 import 'app_localizations_hi.dart';
+import 'app_localizations_ta.dart';
 
 // ignore_for_file: type=lint
 
@@ -96,6 +97,7 @@ abstract class AppLocalizations {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
     Locale('hi'),
+    Locale('ta'),
   ];
 
   /// No description provided for @onboardingTitle.
@@ -325,6 +327,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Affected Plants'**
   String get affectedPlants;
+
+  /// No description provided for @cropWheat.
+  ///
+  /// In en, this message translates to:
+  /// **'Wheat'**
+  String get cropWheat;
+
+  /// No description provided for @cropMaize.
+  ///
+  /// In en, this message translates to:
+  /// **'Maize'**
+  String get cropMaize;
+
+  /// No description provided for @cropCorn.
+  ///
+  /// In en, this message translates to:
+  /// **'Corn'**
+  String get cropCorn;
+
+  /// No description provided for @cropTomato.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomato'**
+  String get cropTomato;
+
+  /// No description provided for @cropPotato.
+  ///
+  /// In en, this message translates to:
+  /// **'Potato'**
+  String get cropPotato;
 }
 
 class _AppLocalizationsDelegate
@@ -338,7 +370,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'hi'].contains(locale.languageCode);
+      <String>['en', 'hi', 'ta'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -351,6 +383,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsEn();
     case 'hi':
       return AppLocalizationsHi();
+    case 'ta':
+      return AppLocalizationsTa();
   }
 
   throw FlutterError(

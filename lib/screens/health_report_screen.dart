@@ -1,6 +1,7 @@
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 class HealthReportScreen extends StatefulWidget {
   const HealthReportScreen({super.key});
@@ -12,16 +13,18 @@ class HealthReportScreen extends StatefulWidget {
 class _HealthReportScreenState extends State<HealthReportScreen> {
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Plant Health Report', hasBackButton: true),
+      appBar: CustomAppBar(title: localizations.plantHealthReport, hasBackButton: true),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              _buildDiseaseStatusCard(),
+              _buildDiseaseStatusCard(localizations),
               const SizedBox(height: 20),
-              _buildAnalysisDetailsCard(),
+              _buildAnalysisDetailsCard(localizations),
             ],
           ),
         ),
@@ -29,7 +32,7 @@ class _HealthReportScreenState extends State<HealthReportScreen> {
     );
   }
 
-  Widget _buildDiseaseStatusCard() {
+  Widget _buildDiseaseStatusCard(AppLocalizations localizations) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -37,24 +40,24 @@ class _HealthReportScreenState extends State<HealthReportScreen> {
         color: AppTheme.affectedColor,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.warning_amber_rounded, color: Colors.white, size: 32),
-          SizedBox(width: 16),
+          const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 32),
+          const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Disease Detected',
-                style: TextStyle(
+                localizations.diseaseDetected,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
               Text(
-                'Severity: High',
-                style: TextStyle(fontSize: 14, color: Colors.white70),
+                localizations.severityHigh,
+                style: const TextStyle(fontSize: 14, color: Colors.white70),
               ),
             ],
           ),
@@ -63,7 +66,7 @@ class _HealthReportScreenState extends State<HealthReportScreen> {
     );
   }
 
-  Widget _buildAnalysisDetailsCard() {
+  Widget _buildAnalysisDetailsCard(AppLocalizations localizations) {
     return Card(
       elevation: 2,
       shadowColor: AppTheme.primaryColor.withOpacity(0.1),
@@ -76,15 +79,14 @@ class _HealthReportScreenState extends State<HealthReportScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Analysis Details',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              localizations.analysisDetails,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // --- Placeholder for the diseased leaf image ---
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
@@ -99,15 +101,15 @@ class _HealthReportScreenState extends State<HealthReportScreen> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _DetailText(label: 'Diagnosis:', value: 'Fungal Leaf Blight'),
-                      SizedBox(height: 8),
-                      _DetailText(label: 'Affected Area:', value: '35%'),
-                      SizedBox(height: 8),
-                      _DetailText(label: 'Recommended Action:', value: 'Apply Fungicide, Isolate the Plant'),
+                      _DetailText(label: localizations.diagnosis, value: localizations.fungalLeafBlight),
+                      const SizedBox(height: 8),
+                      _DetailText(label: localizations.affectedArea, value: '35%'),
+                      const SizedBox(height: 8),
+                      _DetailText(label: localizations.recommendedAction, value: localizations.applyFungicide),
                     ],
                   ),
                 ),

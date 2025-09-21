@@ -1,20 +1,24 @@
 import 'package:agrisense/providers/language_provider.dart';
 import 'package:agrisense/screens/onboarding_screen.dart';
 import 'package:agrisense/theme/app_theme.dart';
-import 'package:device_preview/device_preview.dart'; // Import device_preview
-import 'package:flutter/foundation.dart'; // Import for kReleaseMode
+import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'l10n/app_localizations.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final String? languageCode = prefs.getString('language_code');
+
   runApp(
-    // Wrap the entire app with the DevicePreview widget
     DevicePreview(
-      enabled: !kReleaseMode, // Enable it only in debug mode
+      enabled: !kReleaseMode,
       builder: (context) => ChangeNotifierProvider(
-        create: (context) => LanguageProvider(),
+        create: (context) => LanguageProvider(languageCode),
         child: const AgriSenseApp(),
       ),
     ),
@@ -26,35 +30,37 @@ class AgriSenseApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Listen to the provider for language changes
-    final languageProvider = Provider.of<LanguageProvider>(context);
+    return Consumer<LanguageProvider>(
+      builder: (context, languageProvider, child) {
+        return MaterialApp(
+          // --- DevicePreview Settings ---
+          useInheritedMediaQuery: true,
+          // FIX: The duplicate 'locale' property was removed from here.
+          builder: DevicePreview.appBuilder,
+          // -----------------------------
 
-    return MaterialApp(
-      // --- Add DevicePreview settings ---
-      useInheritedMediaQuery: true,
-      locale: DevicePreview.locale(context),
-      builder: DevicePreview.appBuilder,
-      // ----------------------------------
+          title: 'AgriSense',
+          theme: AppTheme.lightTheme,
+          debugShowCheckedModeBanner: false,
 
-      title: 'AgriSense',
-      theme: AppTheme.lightTheme,
-      debugShowCheckedModeBanner: false,
+          // --- Localization Settings ---
+          locale: languageProvider.appLocale, // This is the single source of truth for the app's language.
+          supportedLocales: const [
+            Locale('en', ''), // English
+            Locale('hi', ''),
+            Locale('ta', ''), // Hindi
+          ],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          // ----------------------------
 
-      // === Localization Settings Start ===
-      // Note: The locale from DevicePreview will override this for testing
-      supportedLocales: const [
-        Locale('en', ''), // English
-        Locale('hi', ''), // Hindi
-      ],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      // === Localization Settings End ===
-
-      home: const OnboardingScreen(),
+          home: const OnboardingScreen(),
+        );
+      },
     );
   }
 }

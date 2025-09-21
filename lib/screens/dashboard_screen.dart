@@ -3,6 +3,7 @@ import 'package:agrisense/screens/plant_scan_screen.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:agrisense/theme/app_theme.dart';
+import '../l10n/app_localizations.dart'; // 1. Import localizations
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -17,17 +18,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 2. Get the localizations object
+    final localizations = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: const CustomAppBar(
-        title: 'Your Farm Overview',
+      appBar: CustomAppBar(
+        // 3. Use the translated text
+        title: localizations.yourFarmOverview,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            _buildFarmSummaryCard(),
+            _buildFarmSummaryCard(localizations),
             const SizedBox(height: 24),
-            _buildSmartControlsCard(),
+            _buildSmartControlsCard(localizations),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
@@ -37,7 +42,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 );
               },
               icon: const Icon(Icons.camera_alt_outlined),
-              label: const Text('Start Plant Health Scan'),
+              label: Text(localizations.startPlantHealthScan),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),
@@ -51,7 +56,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 );
               },
               icon: const Icon(Icons.map_outlined, color: AppTheme.primaryColor),
-              label: const Text('View Farm Map', style: TextStyle(color: AppTheme.primaryColor)),
+              label: Text(localizations.viewFarmMap, style: const TextStyle(color: AppTheme.primaryColor)),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
                 side: const BorderSide(color: AppTheme.primaryColor),
@@ -66,9 +71,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildFarmSummaryCard() {
+  Widget _buildFarmSummaryCard(AppLocalizations localizations) {
     return Card(
-      // Manually applied card styling
       elevation: 2,
       shadowColor: AppTheme.primaryColor.withOpacity(0.1),
       shape: RoundedRectangleBorder(
@@ -80,13 +84,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Farm Summary', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(localizations.farmSummary, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-            _buildSummaryRow(Icons.eco_outlined, 'Crop:', 'Wheat'),
+            _buildSummaryRow(Icons.eco_outlined, localizations.crop, 'Wheat'),
             const SizedBox(height: 12),
-            _buildSummaryRow(Icons.aspect_ratio_outlined, 'Area:', '1000m × 500m'),
+            _buildSummaryRow(Icons.aspect_ratio_outlined, localizations.area, '1000m × 500m'),
             const SizedBox(height: 12),
-            _buildSummaryRow(Icons.format_list_numbered, 'Rows:', '400'),
+            _buildSummaryRow(Icons.format_list_numbered, localizations.rows, '400'),
           ],
         ),
       ),
@@ -111,9 +115,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildSmartControlsCard() {
+  Widget _buildSmartControlsCard(AppLocalizations localizations) {
     return Card(
-      // Manually applied card styling
       elevation: 2,
       shadowColor: AppTheme.primaryColor.withOpacity(0.1),
       shape: RoundedRectangleBorder(
@@ -125,20 +128,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Smart Controls', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(localizations.smartControls, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             _buildControlRow(
               icon: Icons.precision_manufacturing_outlined,
-              label: 'Autonomous Rover',
+              label: localizations.autonomousRover,
               isActive: isRoverActive,
               onToggle: () => setState(() => isRoverActive = !isRoverActive),
+              localizations: localizations,
             ),
             const Divider(height: 24),
             _buildControlRow(
               icon: Icons.water_drop_outlined,
-              label: 'Sprinkler System',
+              label: localizations.sprinklerSystem,
               isActive: isSprinklerActive,
               onToggle: () => setState(() => isSprinklerActive = !isSprinklerActive),
+              localizations: localizations,
             ),
           ],
         ),
@@ -151,6 +156,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required String label,
     required bool isActive,
     required VoidCallback onToggle,
+    required AppLocalizations localizations,
   }) {
     return Row(
       children: [
@@ -168,7 +174,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              isActive ? 'ON' : 'OFF',
+              isActive ? localizations.on : localizations.off,
               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),

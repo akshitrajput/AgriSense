@@ -122,4 +122,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get affectedPlants => 'Affected Plants';
+
+  @override
+  String get cropWheat => 'Wheat';
+
+  @override
+  String get cropMaize => 'Maize';
+
+  @override
+  String get cropCorn => 'Corn';
+
+  @override
+  String get cropTomato => 'Tomato';
+
+  @override
+  String get cropPotato => 'Potato';
 }

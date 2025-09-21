@@ -2,11 +2,11 @@ import 'package:agrisense/screens/health_report_screen.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:agrisense/theme/app_theme.dart';
+import '../l10n/app_localizations.dart';
 
 class PlantScanScreen extends StatelessWidget {
   const PlantScanScreen({super.key});
 
-  // Helper function to navigate to the report screen
   void _navigateToReport(BuildContext context) {
     Navigator.push(
       context,
@@ -16,12 +16,13 @@ class PlantScanScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Plant Health Scan', hasBackButton: true),
+      appBar: CustomAppBar(title: localizations.plantHealthScan, hasBackButton: true),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Card(
-          // Manually applied card styling
           elevation: 2,
           shadowColor: AppTheme.primaryColor.withOpacity(0.1),
           shape: RoundedRectangleBorder(
@@ -34,16 +35,15 @@ class PlantScanScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Primary Action: Tap to capture
                 Expanded(
                   child: InkWell(
                     onTap: () => _navigateToReport(context),
                     highlightColor: AppTheme.backgroundColor,
                     borderRadius: BorderRadius.circular(12),
-                    child: const Column(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CircleAvatar(
+                        const CircleAvatar(
                           radius: 50,
                           backgroundColor: AppTheme.backgroundColor,
                           child: Icon(
@@ -52,37 +52,32 @@ class PlantScanScreen extends StatelessWidget {
                             color: AppTheme.primaryColor,
                           ),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Text(
-                          'Scan with Camera',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                          localizations.scanWithCamera,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
                   ),
                 ),
-
-                // Divider
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Row(
                     children: [
-                      Expanded(child: Divider()),
+                      const Expanded(child: Divider()),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text('OR', style: TextStyle(color: AppTheme.subTextColor)),
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(localizations.or, style: const TextStyle(color: AppTheme.subTextColor)),
                       ),
-                      Expanded(child: Divider()),
+                      const Expanded(child: Divider()),
                     ],
                   ),
                 ),
-
-                // Secondary Action: Upload from storage
                 OutlinedButton.icon(
-                  // This onPressed callback handles the navigation
                   onPressed: () => _navigateToReport(context),
                   icon: const Icon(Icons.photo_library_outlined),
-                  label: const Text('Upload from Storage'),
+                  label: Text(localizations.uploadFromStorage),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     foregroundColor: AppTheme.primaryColor,

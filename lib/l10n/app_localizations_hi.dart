@@ -122,4 +122,19 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get affectedPlants => 'प्रभावित पौधे';
+
+  @override
+  String get cropWheat => 'गेहूं';
+
+  @override
+  String get cropMaize => 'मक्का';
+
+  @override
+  String get cropCorn => 'भुट्टा';
+
+  @override
+  String get cropTomato => 'टमाटर';
+
+  @override
+  String get cropPotato => 'आलू';
 }

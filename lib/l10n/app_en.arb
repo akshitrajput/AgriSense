@@ -37,5 +37,10 @@
     "mapLength": "Length: 100m",
     "mapWidth": "Width: 50m",
     "healthyPlants": "Healthy Plants",
-    "affectedPlants": "Affected Plants"
+    "affectedPlants": "Affected Plants",
+    "cropWheat": "Wheat",
+    "cropMaize": "Maize",
+    "cropCorn": "Corn",
+    "cropTomato": "Tomato",
+    "cropPotato": "Potato"
 }

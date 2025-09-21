@@ -6,35 +6,32 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 
-// Model for our language dropdown
 class Language {
   final String code;
   final String name;
   Language(this.code, this.name);
-
   @override
   String toString() => name;
 }
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
-
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _languageSearchController = TextEditingController();
+  final TextEditingController _cropSearchController = TextEditingController(); // Controller for crop search
 
-  // State for Language Dropdown
   final List<Language> _languages = [
     Language('en', 'English'),
     Language('hi', 'हिन्दी (Hindi)'),
+    Language('ta', 'தமிழ் (Tamil)'), // Added Tamil
     Language('bn', 'বাংলা (Bengali)'),
     Language('te', 'తెలుగు (Telugu)'),
     Language('mr', 'मराठी (Marathi)'),
-    Language('ta', 'தமிழ் (Tamil)'),
     Language('ur', 'اردو (Urdu)'),
     Language('gu', 'ગુજરાતી (Gujarati)'),
     Language('kn', 'ಕನ್ನಡ (Kannada)'),
@@ -45,35 +42,41 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
   Language? _selectedLanguage;
 
-  // State for Crop Type Dropdown
   String? _selectedCrop;
-  final List<String> _cropTypes = [
-    'Wheat',
-    'Maize',
-    'Corn',
-    'Tomato',
-    'Potato',
-  ];
+  // Removed the hardcoded crop list
 
   @override
   void initState() {
     super.initState();
-    _selectedLanguage = _languages.first;
+    final provider = Provider.of<LanguageProvider>(context, listen: false);
+    final currentLangCode = provider.appLocale.languageCode;
+    _selectedLanguage = _languages.firstWhere(
+      (lang) => lang.code == currentLangCode,
+      orElse: () => _languages.first,
+    );
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _languageSearchController.dispose();
+    _cropSearchController.dispose(); // Dispose the new controller
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // FIX: Wrap the Scaffold in a Consumer to listen for language changes
     return Consumer<LanguageProvider>(
       builder: (context, languageProvider, child) {
-        // Get the localization object for accessing translated strings
         final localizations = AppLocalizations.of(context)!;
+
+        // Dynamically create the list of translated crops
+        final List<String> translatedCrops = [
+          localizations.cropWheat,
+          localizations.cropMaize,
+          localizations.cropCorn,
+          localizations.cropTomato,
+          localizations.cropPotato,
+        ];
 
         return Scaffold(
           body: SafeArea(
@@ -94,7 +97,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    localizations.onboardingTitle, // Use localized text
+                    localizations.onboardingTitle,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 24,
@@ -104,12 +107,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    localizations.onboardingSubtitle, // Use localized text
+                    localizations.onboardingSubtitle,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: AppTheme.subTextColor,
-                    ),
+                    style: const TextStyle(fontSize: 16, color: AppTheme.subTextColor),
                   ),
                   const SizedBox(height: 32),
                   Container(
@@ -126,23 +126,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  _buildForm(localizations),
+                  _buildForm(localizations, translatedCrops),
                   const SizedBox(height: 32),
                   ElevatedButton.icon(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const DashboardScreen(),
-                          ),
+                          MaterialPageRoute(builder: (context) => const DashboardScreen()),
                         );
                       }
                     },
                     icon: const Icon(Icons.check_circle_outline),
-                    label: Text(
-                      localizations.createProfile,
-                    ), // Use localized text
+                    label: Text(localizations.createProfile),
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -154,7 +150,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildForm(AppLocalizations localizations) {
+  Widget _buildForm(AppLocalizations localizations, List<String> translatedCrops) {
     return Form(
       key: _formKey,
       child: Column(
@@ -164,11 +160,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _buildTextFormField(
             hintText: localizations.yourName,
             icon: Icons.person_outline,
-            validator: (value) =>
-                value!.isEmpty ? 'Please enter your name' : null,
+            validator: (value) => value!.isEmpty ? 'Please enter your name' : null,
           ),
           const SizedBox(height: 16),
-          _buildCropDropdown(localizations),
+          _buildCropDropdown(localizations, translatedCrops), // Pass the translated list
           const SizedBox(height: 16),
           Row(
             children: [
@@ -196,8 +191,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             hintText: localizations.numberOfRows,
             icon: Icons.format_list_numbered,
             keyboardType: TextInputType.number,
-            validator: (value) =>
-                value!.isEmpty ? 'Enter number of rows' : null,
+            validator: (value) => value!.isEmpty ? 'Enter number of rows' : null,
           ),
         ],
       ),
@@ -220,40 +214,86 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildCropDropdown(AppLocalizations localizations) {
-    return DropdownButtonFormField<String>(
-      value: _selectedCrop,
-      isExpanded: true,
-      decoration: InputDecoration(
-        hintText: localizations.selectCropType,
-        prefixIcon: const Icon(
-          Icons.eco_outlined,
-          color: AppTheme.subTextColor,
+  Widget _buildCropDropdown(AppLocalizations localizations, List<String> cropList) {
+    return DropdownButtonHideUnderline(
+      child: DropdownButton2<String>(
+        isExpanded: true,
+        hint: Text(
+          localizations.selectCropType,
+          style: TextStyle(
+            fontSize: 14,
+            color: Theme.of(context).hintColor,
+          ),
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.borderColor),
+        items: cropList.map((String item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Text(
+              item,
+              style: const TextStyle(fontSize: 14),
+            ),
+          );
+        }).toList(),
+        value: _selectedCrop,
+        onChanged: (String? value) {
+          setState(() {
+            _selectedCrop = value;
+          });
+        },
+        buttonStyleData: ButtonStyleData(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          height: 50,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppTheme.borderColor),
+          ),
         ),
+        dropdownStyleData: DropdownStyleData(
+          maxHeight: 200,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        menuItemStyleData: const MenuItemStyleData(
+          height: 40,
+        ),
+        dropdownSearchData: DropdownSearchData(
+          searchController: _cropSearchController,
+          searchInnerWidgetHeight: 50,
+          searchInnerWidget: Container(
+            height: 50,
+            padding: const EdgeInsets.only(top: 8, bottom: 4, right: 8, left: 8),
+            child: TextFormField(
+              expands: true,
+              maxLines: null,
+              controller: _cropSearchController,
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                hintText: 'Search for a crop...',
+                hintStyle: const TextStyle(fontSize: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+          searchMatchFn: (item, searchValue) {
+            return item.value.toString().toLowerCase().contains(searchValue.toLowerCase());
+          },
+        ),
+        onMenuStateChange: (isOpen) {
+          if (!isOpen) {
+            _cropSearchController.clear();
+          }
+        },
       ),
-      onChanged: (String? newValue) {
-        setState(() {
-          _selectedCrop = newValue;
-        });
-      },
-      validator: (value) => value == null ? 'Please select a crop' : null,
-      items: _cropTypes.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(value: value, child: Text(value));
-      }).toList(),
     );
   }
 
   Widget _buildLanguageDropdown() {
-    // Note: We use listen: false here because this widget only *sends* updates,
-    // it doesn't need to rebuild itself when the language changes.
-    final languageProvider = Provider.of<LanguageProvider>(
-      context,
-      listen: false,
-    );
+    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
 
     return DropdownButtonHideUnderline(
       child: DropdownButton2<Language>(
@@ -261,7 +301,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         items: _languages.map((Language item) {
           return DropdownMenuItem<Language>(
             value: item,
-            child: Text(item.name, style: const TextStyle(fontSize: 14)),
+            child: Text(
+              item.name,
+              style: const TextStyle(fontSize: 14),
+            ),
           );
         }).toList(),
         value: _selectedLanguage,
@@ -269,6 +312,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           if (language != null) {
             setState(() {
               _selectedLanguage = language;
+              // Clear selected crop when language changes, as the list items will change
+              _selectedCrop = null;
             });
             languageProvider.changeLanguage(Locale(language.code));
           }
@@ -284,30 +329,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ),
         dropdownStyleData: DropdownStyleData(
           maxHeight: 200,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
-        menuItemStyleData: const MenuItemStyleData(height: 40),
+        menuItemStyleData: const MenuItemStyleData(
+          height: 40,
+        ),
         dropdownSearchData: DropdownSearchData(
-          searchController: _searchController,
+          searchController: _languageSearchController,
           searchInnerWidgetHeight: 50,
           searchInnerWidget: Container(
             height: 50,
-            padding: const EdgeInsets.only(
-              top: 8,
-              bottom: 4,
-              right: 8,
-              left: 8,
-            ),
+            padding: const EdgeInsets.only(top: 8, bottom: 4, right: 8, left: 8),
             child: TextFormField(
               expands: true,
               maxLines: null,
-              controller: _searchController,
+              controller: _languageSearchController,
               decoration: InputDecoration(
                 isDense: true,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 8,
-                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 hintText: 'Search for a language...',
                 hintStyle: const TextStyle(fontSize: 12),
                 border: OutlineInputBorder(
@@ -317,14 +358,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           searchMatchFn: (item, searchValue) {
-            return item.value.toString().toLowerCase().contains(
-              searchValue.toLowerCase(),
-            );
+            return item.value.toString().toLowerCase().contains(searchValue.toLowerCase());
           },
         ),
         onMenuStateChange: (isOpen) {
           if (!isOpen) {
-            _searchController.clear();
+            _languageSearchController.clear();
           }
         },
       ),

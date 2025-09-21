@@ -37,5 +37,10 @@
     "mapLength": "लंबाई: 100 मीटर",
     "mapWidth": "चौड़ाई: 50 मीटर",
     "healthyPlants": "स्वस्थ पौधे",
-    "affectedPlants": "प्रभावित पौधे"
+    "affectedPlants": "प्रभावित पौधे",
+    "cropWheat": "गेहूं",
+    "cropMaize": "मक्का",
+    "cropCorn": "भुट्टा",
+    "cropTomato": "टमाटर",
+    "cropPotato": "आलू"
 }

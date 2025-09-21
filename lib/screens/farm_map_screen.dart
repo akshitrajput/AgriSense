@@ -1,30 +1,32 @@
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 class FarmMapScreen extends StatelessWidget {
   const FarmMapScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Farm Map View', hasBackButton: true),
+      appBar: CustomAppBar(title: localizations.farmMapView, hasBackButton: true),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
         child: Column(
           children: [
-            _buildMapCard(),
+            _buildMapCard(localizations),
             const SizedBox(height: 20),
-            _buildLegend(),
+            _buildLegend(localizations),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMapCard() {
+  Widget _buildMapCard(AppLocalizations localizations) {
     return Card(
-      // Manually applied card styling
       elevation: 2,
       shadowColor: AppTheme.primaryColor.withOpacity(0.1),
       shape: RoundedRectangleBorder(
@@ -35,19 +37,19 @@ class FarmMapScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            _buildDimensionLabel(label: 'Length: 100m', isHorizontal: true),
+            _buildDimensionLabel(label: localizations.mapLength, isHorizontal: true),
             const SizedBox(height: 8),
             Row(
               children: [
-                _buildDimensionLabel(label: 'Width: 50m', isHorizontal: false),
+                _buildDimensionLabel(label: localizations.mapWidth, isHorizontal: false),
                 const SizedBox(width: 8),
                 Expanded(child: _buildFarmGrid()),
                 const SizedBox(width: 8),
-                _buildDimensionLabel(label: 'Width: 50m', isHorizontal: false),
+                _buildDimensionLabel(label: localizations.mapWidth, isHorizontal: false),
               ],
             ),
             const SizedBox(height: 8),
-            _buildDimensionLabel(label: 'Length: 100m', isHorizontal: true),
+            _buildDimensionLabel(label: localizations.mapLength, isHorizontal: true),
           ],
         ),
       ),
@@ -66,7 +68,7 @@ class FarmMapScreen extends StatelessWidget {
           6,
           (rowIndex) => _FarmRow(
             plantCount: 15,
-            isAffected: rowIndex >= 4, // Make last two rows affected
+            isAffected: rowIndex >= 4,
           ),
         ),
       ),
@@ -82,13 +84,13 @@ class FarmMapScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildLegend() {
-    return const Row(
+  Widget _buildLegend(AppLocalizations localizations) {
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _LegendItem(color: AppTheme.healthyColor, label: 'Healthy Plants'),
-        SizedBox(width: 24),
-        _LegendItem(color: AppTheme.affectedColor, label: 'Affected Plants'),
+        _LegendItem(color: AppTheme.healthyColor, label: localizations.healthyPlants),
+        const SizedBox(width: 24),
+        _LegendItem(color: AppTheme.affectedColor, label: localizations.affectedPlants),
       ],
     );
   }
