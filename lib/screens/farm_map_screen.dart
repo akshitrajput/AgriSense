@@ -1,8 +1,6 @@
 import 'package:agrisense/theme/app_theme.dart';
-import 'package:agrisense/widgets/bottom_nav_buttons.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
 class FarmMapScreen extends StatelessWidget {
   const FarmMapScreen({super.key});
@@ -18,8 +16,6 @@ class FarmMapScreen extends StatelessWidget {
             _buildMapCard(),
             const SizedBox(height: 20),
             _buildLegend(),
-            const Spacer(),
-            const BottomNavButtons(),
           ],
         ),
       ),
@@ -28,6 +24,13 @@ class FarmMapScreen extends StatelessWidget {
 
   Widget _buildMapCard() {
     return Card(
+      // Manually applied card styling
+      elevation: 2,
+      shadowColor: AppTheme.primaryColor.withOpacity(0.1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: AppTheme.borderColor, width: 1),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

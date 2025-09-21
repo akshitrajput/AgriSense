@@ -12,28 +12,14 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  bool isDarkMode = false;
   bool isRoverActive = false;
   bool isSprinklerActive = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
         title: 'Your Farm Overview',
-        actions: [
-          Icon(isDarkMode ? Icons.nightlight_round : Icons.wb_sunny_rounded, color: AppTheme.subTextColor),
-          Switch(
-            value: isDarkMode,
-            onChanged: (value) {
-              setState(() {
-                isDarkMode = value;
-                // Add theme switching logic here
-              });
-            },
-            activeColor: AppTheme.primaryColor,
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
@@ -56,7 +42,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 minimumSize: const Size(double.infinity, 50),
               ),
             ),
-             const SizedBox(height: 12),
+            const SizedBox(height: 12),
             OutlinedButton.icon(
               onPressed: () {
                 Navigator.push(
@@ -82,6 +68,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildFarmSummaryCard() {
     return Card(
+      // Manually applied card styling
+      elevation: 2,
+      shadowColor: AppTheme.primaryColor.withOpacity(0.1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: AppTheme.borderColor, width: 1),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -120,6 +113,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildSmartControlsCard() {
     return Card(
+      // Manually applied card styling
+      elevation: 2,
+      shadowColor: AppTheme.primaryColor.withOpacity(0.1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: AppTheme.borderColor, width: 1),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(

@@ -28,7 +28,6 @@ class AppTheme {
       onSurface: textColor,
       onError: Colors.white,
     ),
-    // Reverted to default text theme and applied custom colors
     textTheme: ThemeData.light().textTheme.apply(
           bodyColor: textColor,
           displayColor: textColor,
@@ -37,12 +36,10 @@ class AppTheme {
       backgroundColor: Colors.transparent,
       elevation: 0,
       iconTheme: IconThemeData(color: textColor),
-      // Used standard TextStyle instead of GoogleFonts
       titleTextStyle: TextStyle(
         color: textColor,
         fontSize: 20,
         fontWeight: FontWeight.w600,
-        fontFamily: '.SF UI Display', // Default iOS font, Flutter handles Android equivalent
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
@@ -53,7 +50,6 @@ class AppTheme {
           borderRadius: BorderRadius.circular(30.0),
         ),
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-        // Used standard TextStyle instead of GoogleFonts
         textStyle: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
@@ -77,14 +73,6 @@ class AppTheme {
         borderSide: const BorderSide(color: primaryColor, width: 2),
       ),
     ),
-    cardTheme: CardTheme(
-      color: cardColor,
-      elevation: 2,
-      shadowColor: primaryColor.withOpacity(0.1),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade200, width: 1),
-      ),
-    ),
+    // CardTheme section has been removed.
   );
 }

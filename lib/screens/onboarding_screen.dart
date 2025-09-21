@@ -1,5 +1,8 @@
+// lib/screens/onboarding_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:agrisense/screens/dashboard_screen.dart';
+import 'package:agrisense/theme/app_theme.dart'; // FIXED: Added import for AppTheme
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -24,7 +27,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 40),
-              Image.asset('assets/images/agrisense_logo.png', height: 40),
+              // Make sure you have this logo in your assets folder
+              // Image.asset('assets/images/agrisense_logo.png', height: 40),
+              const Text("AgriSense", textAlign: TextAlign.center, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
               const SizedBox(height: 24),
               const Text(
                 "Cultivating Your Profile\nLet's begin your harvest.",
@@ -42,7 +47,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 style: TextStyle(fontSize: 16, color: AppTheme.subTextColor),
               ),
               const SizedBox(height: 32),
-              Image.asset('assets/images/leaf_illustration.png', height: 100),
+              // Make sure you have this illustration in your assets folder
+              // Image.asset('assets/images/leaf_illustration.png', height: 100),
+              const Icon(Icons.eco, size: 100, color: AppTheme.accentColor),
               const SizedBox(height: 32),
               _buildForm(),
               const SizedBox(height: 32),
