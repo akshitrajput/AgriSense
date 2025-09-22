@@ -1,40 +1,78 @@
-import 'package:agrisense/services/local_storage_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
+import '../models/farm_data.dart';
+import '../services/local_storage_service.dart'; // Required for migration
 
 class FarmDataProvider with ChangeNotifier {
-  Map<String, dynamic> _farmData = {};
+  Isar? _isar;
+  FarmData? _farmData;
   bool _isLoading = true;
 
-  Map<String, dynamic> get farmData => _farmData;
+  FarmData? get farmData => _farmData;
   bool get isLoading => _isLoading;
 
   FarmDataProvider() {
-    loadFarmData();
+    _initIsar();
+  }
+
+  Future<void> _initIsar() async {
+    if (_isar?.isOpen == true) return;
+
+    final dir = await getApplicationDocumentsDirectory();
+    _isar = await Isar.open(
+      [FarmDataSchema],
+      directory: dir.path,
+    );
+    await loadFarmData();
   }
 
   Future<void> loadFarmData() async {
-    _farmData = await LocalStorageService.loadFarmData();
+    if (_isar == null) await _initIsar();
+
+    _farmData = await _isar!.farmDatas.where().findFirst();
+
+    // One-time migration logic if no data is in Isar
+    if (_farmData == null) {
+      final oldData = await LocalStorageService.loadFarmData();
+      if (oldData.isNotEmpty) {
+        final migratedData = FarmData.fromMap(oldData);
+        await updateFarmData(migratedData); // Use update to save and set state
+        print("Successfully migrated data from SharedPreferences to Isar.");
+        // Clear old data after successful migration
+        await LocalStorageService.clearAllData();
+      }
+    }
+
     _isLoading = false;
     notifyListeners();
   }
 
-  Future<void> updateFarmData(Map<String, dynamic> newData) async {
-    // Set loading state to TRUE before starting the save operation
-    _isLoading = true;
-    notifyListeners();
+  Future<void> updateFarmData(FarmData dataToSave) async {
+    if (_isar == null) return;
 
-    _farmData = newData;
-    await LocalStorageService.saveFarmData(newData);
+    await _isar!.writeTxn(() async {
+      await _isar!.farmDatas.put(dataToSave);
+    });
 
-    // Set loading state to FALSE after the save is complete
-    _isLoading = false;
+    // Update the in-memory copy and notify UI
+    _farmData = dataToSave;
     notifyListeners();
   }
 
-  void clearData() {
-    _farmData = {};
-    _isLoading = true;
-    LocalStorageService.clearAllData();
+  Future<void> clearData() async {
+    if (_isar == null) return;
+
+    await _isar!.writeTxn(() async {
+      await _isar!.farmDatas.clear();
+    });
+    _farmData = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _isar?.close();
+    super.dispose();
   }
 }

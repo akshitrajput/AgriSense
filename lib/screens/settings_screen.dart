@@ -1,8 +1,8 @@
 import 'package:agrisense/l10n/app_localizations.dart';
+import 'package:agrisense/models/farm_data.dart';
 import 'package:agrisense/providers/farm_data_provider.dart';
 import 'package:agrisense/providers/language_provider.dart';
 import 'package:agrisense/screens/info_profile_screen.dart';
-import 'package:agrisense/services/local_storage_service.dart';
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -39,12 +39,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.initState();
     final farmData = context.read<FarmDataProvider>().farmData;
     final langProvider = context.read<LanguageProvider>();
-    _nameController = TextEditingController(text: farmData['name'] ?? '');
-    _lengthController = TextEditingController(text: farmData['farmLength']?.toString() ?? '');
-    _breadthController = TextEditingController(text: farmData['farmBreadth']?.toString() ?? '');
-    _rowsController = TextEditingController(text: farmData['rows']?.toString() ?? '');
-    _plantsPerRowController = TextEditingController(text: farmData['plantsPerRow']?.toString() ?? '');
-    _selectedCropKey = farmData['cropTypeKey'];
+
+    _nameController = TextEditingController(text: farmData?.name ?? '');
+    _lengthController = TextEditingController(text: farmData?.farmLength?.toString() ?? '');
+    _breadthController = TextEditingController(text: farmData?.farmBreadth?.toString() ?? '');
+    _rowsController = TextEditingController(text: farmData?.rows?.toString() ?? '');
+    _plantsPerRowController = TextEditingController(text: farmData?.plantsPerRow?.toString() ?? '');
+    _selectedCropKey = farmData?.cropTypeKey;
     _selectedLanguage = _languages.firstWhere((lang) => lang.code == langProvider.appLocale.languageCode, orElse: () => _languages.first);
   }
 
@@ -74,15 +75,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (_formKey.currentState!.validate()) {
       final farmDataProvider = context.read<FarmDataProvider>();
       final localizations = AppLocalizations.of(context)!;
-      final newFarmData = Map<String, dynamic>.from(farmDataProvider.farmData);
 
-      newFarmData['name'] = _nameController.text;
-      newFarmData['cropTypeKey'] = _selectedCropKey;
-      newFarmData['farmLength'] = double.tryParse(_lengthController.text) ?? 0.0;
-      newFarmData['farmBreadth'] = double.tryParse(_breadthController.text) ?? 0.0;
-      newFarmData['rows'] = int.tryParse(_rowsController.text) ?? 0;
-      newFarmData['plantsPerRow'] = int.tryParse(_plantsPerRowController.text) ?? 0;
+      final existingFarmData = farmDataProvider.farmData;
 
+      // Create a FarmData object with updated values
+      final newFarmData = FarmData(
+        id: existingFarmData?.id, // IMPORTANT: Preserve the existing ID to update the record
+        name: _nameController.text,
+        cropTypeKey: _selectedCropKey,
+        farmLength: double.tryParse(_lengthController.text) ?? 0.0,
+        farmBreadth: double.tryParse(_breadthController.text) ?? 0.0,
+        rows: int.tryParse(_rowsController.text) ?? 0,
+        plantsPerRow: int.tryParse(_plantsPerRowController.text) ?? 0,
+      );
+
+      // Pass the type-safe object to the provider
       await farmDataProvider.updateFarmData(newFarmData);
 
       if (!mounted) return;
@@ -98,10 +105,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _logout() async {
-    // Use the centralized service to clear all app data
-    await LocalStorageService.clearAllData();
-
-    // Also clear the data from the provider in memory
+    // Let the provider handle clearing the database
     context.read<FarmDataProvider>().clearData();
 
     if (!mounted) return;
@@ -224,7 +228,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           if (l != null) {
             setState(() {
               _selectedLanguage = l;
-              _selectedCropKey = null;
+              _selectedCropKey = null; // Reset crop selection on language change
             });
             languageProvider.changeLanguage(Locale(l.code));
           }
@@ -268,4 +272,3 @@ class Language {
   @override
   String toString() => name;
 }
-

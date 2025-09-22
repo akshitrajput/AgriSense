@@ -1,4 +1,5 @@
 import 'package:agrisense/models/daily_forecast.dart';
+import 'package:agrisense/models/farm_data.dart';
 import 'package:agrisense/providers/farm_data_provider.dart';
 import 'package:agrisense/screens/farm_map_screen.dart';
 import 'package:agrisense/screens/health_report_screen.dart';
@@ -21,37 +22,29 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool isRoverActive = false;
   bool isSprinklerActive = false;
-
-  // Future to hold the weather data
   late Future<List<DailyForecast>> _forecastFuture;
 
   @override
   void initState() {
     super.initState();
-    // Fetch the weather forecast when the screen is first loaded
     _forecastFuture = WeatherService.fetchWeatherForecast();
   }
 
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    // Use 'watch' to listen for data changes and loading states
     final farmDataProvider = context.watch<FarmDataProvider>();
-    final farmData = farmDataProvider.farmData;
+    final farmData = farmDataProvider.farmData!; // We can now safely use `!` because SplashScreen guarantees data exists.
 
-    // Show a loading indicator while the provider is preparing data
-    if (farmDataProvider.isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+    // REMOVED: The `if (farmData == null)` block is gone.
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: '${localizations.welcomeMessage} ${farmData['name'] ?? ''}!',
+        title: '${localizations.welcomeMessage} ${farmData.name ?? ''}!',
         actions: [
           IconButton(
             onPressed: () {
+              // Use push instead of pushAndRemoveUntil to allow returning to the dashboard
               Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
             },
             icon: const Icon(Icons.settings_outlined, size: 28.0),
@@ -76,6 +69,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  // --- All other helper methods (_buildWeatherForecastCard, etc.) remain unchanged ---
   Widget _buildWeatherForecastCard() {
     return Card(
       elevation: 2,
@@ -96,14 +90,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(child: Text('No forecast data available.'));
                 }
-
                 final forecasts = snapshot.data!;
                 return SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: forecasts.map((forecast) {
-                      return _buildDailyForecastItem(forecast);
-                    }).toList(),
+                    children: forecasts.map((forecast) => _buildDailyForecastItem(forecast)).toList(),
                   ),
                 );
               },
@@ -136,9 +127,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildFarmSummaryCard(AppLocalizations localizations, Map<String, dynamic> farmData) {
+  Widget _buildFarmSummaryCard(AppLocalizations localizations, FarmData farmData) {
     String cropDisplay = 'N/A';
-    final String? cropKey = farmData['cropTypeKey'];
+    final String? cropKey = farmData.cropTypeKey;
     if (cropKey != null) {
       final Map<String, String> translatedCrops = {
         'wheat': localizations.cropWheat, 'maize': localizations.cropMaize, 'corn': localizations.cropCorn,
@@ -146,7 +137,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       };
       cropDisplay = translatedCrops[cropKey] ?? 'N/A';
     }
-
     return Card(
       elevation: 2,
       child: Padding(
@@ -158,9 +148,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 16),
             _buildSummaryRow(Icons.eco_outlined, localizations.crop, cropDisplay),
             const SizedBox(height: 12),
-            _buildSummaryRow(Icons.aspect_ratio_outlined, localizations.area, '${farmData['farmLength'] ?? 0}m × ${farmData['farmBreadth'] ?? 0}m'),
+            _buildSummaryRow(Icons.aspect_ratio_outlined, localizations.area, '${farmData.farmLength ?? 0}m × ${farmData.farmBreadth ?? 0}m'),
             const SizedBox(height: 12),
-            _buildSummaryRow(Icons.format_list_numbered, localizations.rows, '${farmData['rows'] ?? 0}'),
+            _buildSummaryRow(Icons.format_list_numbered, localizations.rows, '${farmData.rows ?? 0}'),
           ],
         ),
       ),
@@ -214,17 +204,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ]);
   }
 
-  Widget _buildNavigationButtons(AppLocalizations localizations, Map<String, dynamic> farmData) {
+  Widget _buildNavigationButtons(AppLocalizations localizations, FarmData farmData) {
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Text(localizations.toolsAndAnalytics, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textColor)),
       const SizedBox(height: 16),
       OutlinedButton.icon(
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) => FarmMapScreen(
-            farmLength: (farmData['farmLength'] ?? 0.0).toDouble(),
-            farmWidth: (farmData['farmBreadth'] ?? 0.0).toDouble(),
-            rows: farmData['rows'] ?? 0,
-            plantsPerRow: farmData['plantsPerRow'] ?? 0,
+            farmLength: farmData.farmLength ?? 0.0,
+            farmWidth: farmData.farmBreadth ?? 0.0,
+            rows: farmData.rows ?? 0,
+            plantsPerRow: farmData.plantsPerRow ?? 0,
           )));
         },
         icon: const Icon(Icons.map_outlined),
@@ -233,7 +223,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       const SizedBox(height: 12),
       OutlinedButton.icon(
         onPressed: () {
-          // FIX: Create and pass a placeholder report object
           final placeholderReport = HealthReport(
               diagnosis: "Fungal Leaf Blight",
               severity: "High",
@@ -256,4 +245,3 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ]);
   }
 }
-

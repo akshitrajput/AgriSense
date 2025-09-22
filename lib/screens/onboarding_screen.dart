@@ -1,3 +1,4 @@
+import 'package:agrisense/models/farm_data.dart'; // Import the FarmData model
 import 'package:agrisense/providers/farm_data_provider.dart';
 import 'package:agrisense/screens/dashboard_screen.dart';
 import 'package:agrisense/services/local_storage_service.dart';
@@ -24,29 +25,52 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _plantsPerRowController = TextEditingController();
 
   String? _selectedCropKey;
-  Future<void>? _savingFuture;
 
-  void _createProfile() {
+  void _createProfile() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _savingFuture = _saveDataAndNavigate();
-      });
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 20),
+                Text('Saving Your Farm Profile...', style: TextStyle(color: Colors.white, decoration: TextDecoration.none)),
+              ],
+            ),
+          );
+        },
+      );
+
+      final farmDataProvider = context.read<FarmDataProvider>();
+
+      // CORRECTED: Create a FarmData object instead of a Map
+      final newFarmData = FarmData(
+        name: widget.farmerName,
+        cropTypeKey: _selectedCropKey,
+        farmLength: double.tryParse(_lengthController.text) ?? 0.0,
+        farmBreadth: double.tryParse(_breadthController.text) ?? 0.0,
+        rows: int.tryParse(_rowsController.text) ?? 0,
+        plantsPerRow: int.tryParse(_plantsPerRowController.text) ?? 0,
+      );
+
+      // Pass the new FarmData object to the provider
+      await farmDataProvider.updateFarmData(newFarmData);
+      await LocalStorageService.setOnboardingComplete(true);
+
+      if (mounted) {
+        Navigator.of(context).pop(); // Dismiss the dialog
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const DashboardScreen()),
+              (route) => false,
+        );
+      }
     }
-  }
-
-  Future<void> _saveDataAndNavigate() async {
-    final farmDataProvider = context.read<FarmDataProvider>();
-    final farmData = {
-      'name': widget.farmerName,
-      'cropTypeKey': _selectedCropKey,
-      'farmLength': double.tryParse(_lengthController.text) ?? 0.0,
-      'farmBreadth': double.tryParse(_breadthController.text) ?? 0.0,
-      'rows': int.tryParse(_rowsController.text) ?? 0,
-      'plantsPerRow': int.tryParse(_plantsPerRowController.text) ?? 0,
-    };
-
-    await farmDataProvider.updateFarmData(farmData);
-    await LocalStorageService.setOnboardingComplete(true);
   }
 
   @override
@@ -61,48 +85,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // If the saving process hasn't started, show the form.
-    // Otherwise, show the loading screen with the FutureBuilder.
-    return _savingFuture == null ? _buildFormScreen() : _buildLoadingScreen();
-  }
-
-  Widget _buildLoadingScreen() {
-    return FutureBuilder<void>(
-      future: _savingFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 20),
-                  Text('Saving Your Farm Profile...'),
-                ],
-              ),
-            ),
-          );
-        }
-
-        // After the future completes, navigate.
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const DashboardScreen()),
-                  (route) => false,
-            );
-          }
-        });
-
-        // Return an empty container while navigating.
-        return Container();
-      },
-    );
-  }
-
-  Widget _buildFormScreen() {
     final localizations = AppLocalizations.of(context)!;
     final Map<String, String> translatedCrops = {
       'wheat': localizations.cropWheat,
