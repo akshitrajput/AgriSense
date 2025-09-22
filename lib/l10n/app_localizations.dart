@@ -100,17 +100,11 @@ abstract class AppLocalizations {
     Locale('ta'),
   ];
 
-  /// No description provided for @onboardingTitle.
+  /// No description provided for @welcomeMessage.
   ///
   /// In en, this message translates to:
-  /// **'Cultivating Your Profile\nLet\'s begin your harvest.'**
-  String get onboardingTitle;
-
-  /// No description provided for @onboardingSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Tell us about your farm.'**
-  String get onboardingSubtitle;
+  /// **'Welcome,'**
+  String get welcomeMessage;
 
   /// No description provided for @yourName.
   ///
@@ -118,11 +112,95 @@ abstract class AppLocalizations {
   /// **'Your Name'**
   String get yourName;
 
-  /// No description provided for @selectCropType.
+  /// No description provided for @close.
   ///
   /// In en, this message translates to:
-  /// **'Select Crop Type'**
-  String get selectCropType;
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @continueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueButton;
+
+  /// No description provided for @or.
+  ///
+  /// In en, this message translates to:
+  /// **'OR'**
+  String get or;
+
+  /// No description provided for @on.
+  ///
+  /// In en, this message translates to:
+  /// **'ON'**
+  String get on;
+
+  /// No description provided for @off.
+  ///
+  /// In en, this message translates to:
+  /// **'OFF'**
+  String get off;
+
+  /// No description provided for @welcomeToAgriSense.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to AgriSense!'**
+  String get welcomeToAgriSense;
+
+  /// No description provided for @letsGetYouStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s get you started with a few details.'**
+  String get letsGetYouStarted;
+
+  /// No description provided for @selectYourLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Your Language'**
+  String get selectYourLanguage;
+
+  /// No description provided for @welcomeFarmer.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome, {farmerName}!'**
+  String welcomeFarmer(String farmerName);
+
+  /// No description provided for @onboardingFarmDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide your farm\'s details to complete your profile.'**
+  String get onboardingFarmDetails;
+
+  /// No description provided for @farmDimensions.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm Dimensions'**
+  String get farmDimensions;
+
+  /// No description provided for @farmLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm Location'**
+  String get farmLocation;
+
+  /// No description provided for @plantationDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Plantation Details'**
+  String get plantationDetails;
+
+  /// No description provided for @chooseLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Location on Map'**
+  String get chooseLocation;
+
+  /// No description provided for @locationSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Location Selected!'**
+  String get locationSelected;
 
   /// No description provided for @length.
   ///
@@ -142,17 +220,17 @@ abstract class AppLocalizations {
   /// **'Number of Rows'**
   String get numberOfRows;
 
-  /// No description provided for @createProfile.
+  /// No description provided for @plantsPerRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Plants per Row'**
+  String get plantsPerRow;
+
+  /// No description provided for @createFarmProfile.
   ///
   /// In en, this message translates to:
   /// **'Create Farm Profile'**
-  String get createProfile;
-
-  /// No description provided for @yourFarmOverview.
-  ///
-  /// In en, this message translates to:
-  /// **'Your Farm Overview'**
-  String get yourFarmOverview;
+  String get createFarmProfile;
 
   /// No description provided for @farmSummary.
   ///
@@ -196,29 +274,83 @@ abstract class AppLocalizations {
   /// **'Sprinkler System'**
   String get sprinklerSystem;
 
-  /// No description provided for @on.
+  /// No description provided for @toolsAndAnalytics.
   ///
   /// In en, this message translates to:
-  /// **'ON'**
-  String get on;
-
-  /// No description provided for @off.
-  ///
-  /// In en, this message translates to:
-  /// **'OFF'**
-  String get off;
-
-  /// No description provided for @startPlantHealthScan.
-  ///
-  /// In en, this message translates to:
-  /// **'Start Plant Health Scan'**
-  String get startPlantHealthScan;
+  /// **'Tools & Analytics'**
+  String get toolsAndAnalytics;
 
   /// No description provided for @viewFarmMap.
   ///
   /// In en, this message translates to:
   /// **'View Farm Map'**
   String get viewFarmMap;
+
+  /// No description provided for @viewPreviousReports.
+  ///
+  /// In en, this message translates to:
+  /// **'View Previous Reports'**
+  String get viewPreviousReports;
+
+  /// No description provided for @scanNewPlant.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan a New Plant'**
+  String get scanNewPlant;
+
+  /// No description provided for @marketAndWeather.
+  ///
+  /// In en, this message translates to:
+  /// **'Market & Weather'**
+  String get marketAndWeather;
+
+  /// No description provided for @chennaiWeather.
+  ///
+  /// In en, this message translates to:
+  /// **'Chennai Weather'**
+  String get chennaiWeather;
+
+  /// No description provided for @humidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity'**
+  String get humidity;
+
+  /// No description provided for @wind.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind'**
+  String get wind;
+
+  /// No description provided for @rain.
+  ///
+  /// In en, this message translates to:
+  /// **'Rain'**
+  String get rain;
+
+  /// No description provided for @farmingTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Farming Tips & News'**
+  String get farmingTips;
+
+  /// No description provided for @tip1.
+  ///
+  /// In en, this message translates to:
+  /// **'New organic pesticide shows promising results in early trials.'**
+  String get tip1;
+
+  /// No description provided for @tip2.
+  ///
+  /// In en, this message translates to:
+  /// **'Proper soil aeration can increase crop yield by up to 15%.'**
+  String get tip2;
+
+  /// No description provided for @tip3.
+  ///
+  /// In en, this message translates to:
+  /// **'Consider drip irrigation to conserve water during dry seasons.'**
+  String get tip3;
 
   /// No description provided for @plantHealthScan.
   ///
@@ -231,12 +363,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Scan with Camera'**
   String get scanWithCamera;
-
-  /// No description provided for @or.
-  ///
-  /// In en, this message translates to:
-  /// **'OR'**
-  String get or;
 
   /// No description provided for @uploadFromStorage.
   ///
@@ -271,7 +397,7 @@ abstract class AppLocalizations {
   /// No description provided for @diagnosis.
   ///
   /// In en, this message translates to:
-  /// **'Diagnosis:'**
+  /// **'Diagnosis'**
   String get diagnosis;
 
   /// No description provided for @fungalLeafBlight.
@@ -283,13 +409,13 @@ abstract class AppLocalizations {
   /// No description provided for @affectedArea.
   ///
   /// In en, this message translates to:
-  /// **'Affected Area:'**
+  /// **'Affected Area'**
   String get affectedArea;
 
   /// No description provided for @recommendedAction.
   ///
   /// In en, this message translates to:
-  /// **'Recommended Action:'**
+  /// **'Recommended Action'**
   String get recommendedAction;
 
   /// No description provided for @applyFungicide.
@@ -304,18 +430,6 @@ abstract class AppLocalizations {
   /// **'Farm Map View'**
   String get farmMapView;
 
-  /// No description provided for @mapLength.
-  ///
-  /// In en, this message translates to:
-  /// **'Length: 100m'**
-  String get mapLength;
-
-  /// No description provided for @mapWidth.
-  ///
-  /// In en, this message translates to:
-  /// **'Width: 50m'**
-  String get mapWidth;
-
   /// No description provided for @healthyPlants.
   ///
   /// In en, this message translates to:
@@ -327,60 +441,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Affected Plants'**
   String get affectedPlants;
-
-  /// No description provided for @cropWheat.
-  ///
-  /// In en, this message translates to:
-  /// **'Wheat'**
-  String get cropWheat;
-
-  /// No description provided for @cropMaize.
-  ///
-  /// In en, this message translates to:
-  /// **'Maize'**
-  String get cropMaize;
-
-  /// No description provided for @cropCorn.
-  ///
-  /// In en, this message translates to:
-  /// **'Corn'**
-  String get cropCorn;
-
-  /// No description provided for @cropTomato.
-  ///
-  /// In en, this message translates to:
-  /// **'Tomato'**
-  String get cropTomato;
-
-  /// No description provided for @cropPotato.
-  ///
-  /// In en, this message translates to:
-  /// **'Potato'**
-  String get cropPotato;
-
-  /// No description provided for @plantsPerRow.
-  ///
-  /// In en, this message translates to:
-  /// **'Plants per Row'**
-  String get plantsPerRow;
-
-  /// No description provided for @toolsAndAnalytics.
-  ///
-  /// In en, this message translates to:
-  /// **'Tools & Analytics'**
-  String get toolsAndAnalytics;
-
-  /// No description provided for @viewPreviousReports.
-  ///
-  /// In en, this message translates to:
-  /// **'View Previous Reports'**
-  String get viewPreviousReports;
-
-  /// No description provided for @scanNewPlant.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan a New Plant'**
-  String get scanNewPlant;
 
   /// No description provided for @cropDetailsTitle.
   ///
@@ -399,18 +459,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mark as Healthy'**
   String get markHealthy;
-
-  /// No description provided for @close.
-  ///
-  /// In en, this message translates to:
-  /// **'Close'**
-  String get close;
-
-  /// No description provided for @welcomeMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome,'**
-  String get welcomeMessage;
 
   /// No description provided for @settings.
   ///
@@ -453,6 +501,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Details updated successfully!'**
   String get detailsUpdatedMessage;
+
+  /// No description provided for @selectCropType.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Crop Type'**
+  String get selectCropType;
+
+  /// No description provided for @cropWheat.
+  ///
+  /// In en, this message translates to:
+  /// **'Wheat'**
+  String get cropWheat;
+
+  /// No description provided for @cropMaize.
+  ///
+  /// In en, this message translates to:
+  /// **'Maize'**
+  String get cropMaize;
+
+  /// No description provided for @cropCorn.
+  ///
+  /// In en, this message translates to:
+  /// **'Corn'**
+  String get cropCorn;
+
+  /// No description provided for @cropTomato.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomato'**
+  String get cropTomato;
+
+  /// No description provided for @cropPotato.
+  ///
+  /// In en, this message translates to:
+  /// **'Potato'**
+  String get cropPotato;
 }
 
 class _AppLocalizationsDelegate

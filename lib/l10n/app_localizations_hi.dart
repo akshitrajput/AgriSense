@@ -9,17 +9,58 @@ class AppLocalizationsHi extends AppLocalizations {
   AppLocalizationsHi([String locale = 'hi']) : super(locale);
 
   @override
-  String get onboardingTitle =>
-      'आपकी प्रोफ़ाइल विकसित हो रही है\nचलिए आपकी फसल शुरू करते हैं।';
-
-  @override
-  String get onboardingSubtitle => 'हमें अपने खेत के बारे में बताएं।';
+  String get welcomeMessage => 'स्वागत है,';
 
   @override
   String get yourName => 'आपका नाम';
 
   @override
-  String get selectCropType => 'फसल का प्रकार चुनें';
+  String get close => 'बंद करें';
+
+  @override
+  String get continueButton => 'जारी रखें';
+
+  @override
+  String get or => 'या';
+
+  @override
+  String get on => 'चालू';
+
+  @override
+  String get off => 'बंद';
+
+  @override
+  String get welcomeToAgriSense => 'एग्रीसेंस में आपका स्वागत है!';
+
+  @override
+  String get letsGetYouStarted => 'चलिए कुछ विवरणों के साथ शुरू करते हैं।';
+
+  @override
+  String get selectYourLanguage => 'अपनी भाषा चुनें';
+
+  @override
+  String welcomeFarmer(String farmerName) {
+    return 'स्वागत है, $farmerName!';
+  }
+
+  @override
+  String get onboardingFarmDetails =>
+      'अपनी प्रोफ़ाइल पूरी करने के लिए कृपया अपने खेत का विवरण प्रदान करें।';
+
+  @override
+  String get farmDimensions => 'खेत के आयाम';
+
+  @override
+  String get farmLocation => 'खेत का स्थान';
+
+  @override
+  String get plantationDetails => 'वृक्षारोपण विवरण';
+
+  @override
+  String get chooseLocation => 'नक्शे पर स्थान चुनें';
+
+  @override
+  String get locationSelected => 'स्थान चुन लिया गया है!';
 
   @override
   String get length => 'लंबाई (मीटर)';
@@ -31,16 +72,16 @@ class AppLocalizationsHi extends AppLocalizations {
   String get numberOfRows => 'पंक्तियों की संख्या';
 
   @override
-  String get createProfile => 'फार्म प्रोफाइल बनाएं';
+  String get plantsPerRow => 'प्रति पंक्ति पौधे';
 
   @override
-  String get yourFarmOverview => 'आपके खेत का अवलोकन';
+  String get createFarmProfile => 'फार्म प्रोफ़ाइल बनाएं';
 
   @override
   String get farmSummary => 'खेत का सारांश';
 
   @override
-  String get crop => 'फसल:';
+  String get crop => 'फ़सल:';
 
   @override
   String get area => 'क्षेत्र:';
@@ -58,25 +99,51 @@ class AppLocalizationsHi extends AppLocalizations {
   String get sprinklerSystem => 'स्प्रिंकलर सिस्टम';
 
   @override
-  String get on => 'चालू';
-
-  @override
-  String get off => 'बंद';
-
-  @override
-  String get startPlantHealthScan => 'पौधों का स्वास्थ्य स्कैन शुरू करें';
+  String get toolsAndAnalytics => 'उपकरण और विश्लेषण';
 
   @override
   String get viewFarmMap => 'खेत का नक्शा देखें';
+
+  @override
+  String get viewPreviousReports => 'पिछली रिपोर्ट देखें';
+
+  @override
+  String get scanNewPlant => 'एक नया पौधा स्कैन करें';
+
+  @override
+  String get marketAndWeather => 'बाजार और मौसम';
+
+  @override
+  String get chennaiWeather => 'चेन्नई का मौसम';
+
+  @override
+  String get humidity => 'नमी';
+
+  @override
+  String get wind => 'हवा';
+
+  @override
+  String get rain => 'बारिश';
+
+  @override
+  String get farmingTips => 'खेती के सुझाव और समाचार';
+
+  @override
+  String get tip1 =>
+      'नए जैविक कीटनाशक के शुरुआती परीक्षणों में अच्छे परिणाम दिख रहे हैं।';
+
+  @override
+  String get tip2 => 'उचित मिट्टी वातन से फसल की उपज 15% तक बढ़ सकती है।';
+
+  @override
+  String get tip3 =>
+      'सूखे मौसम में पानी बचाने के लिए ड्रिप सिंचाई पर विचार करें।';
 
   @override
   String get plantHealthScan => 'पौधों का स्वास्थ्य स्कैन';
 
   @override
   String get scanWithCamera => 'कैमरे से स्कैन करें';
-
-  @override
-  String get or => 'या';
 
   @override
   String get uploadFromStorage => 'स्टोरेज से अपलोड करें';
@@ -94,28 +161,22 @@ class AppLocalizationsHi extends AppLocalizations {
   String get analysisDetails => 'विश्लेषण विवरण';
 
   @override
-  String get diagnosis => 'निदान:';
+  String get diagnosis => 'निदान';
 
   @override
   String get fungalLeafBlight => 'फंगल लीफ ब्लाइट';
 
   @override
-  String get affectedArea => 'प्रभावित क्षेत्र:';
+  String get affectedArea => 'प्रभावित क्षेत्र';
 
   @override
-  String get recommendedAction => 'अनुशंसित कार्रवाई:';
+  String get recommendedAction => 'अनुशंसित कार्रवाई';
 
   @override
   String get applyFungicide => 'कवकनाशी लगाएं, पौधे को अलग करें';
 
   @override
-  String get farmMapView => 'खेत का नक्शा दृश्य';
-
-  @override
-  String get mapLength => 'लंबाई: 100 मीटर';
-
-  @override
-  String get mapWidth => 'चौड़ाई: 50 मीटर';
+  String get farmMapView => 'खेत का नक्शा देखें';
 
   @override
   String get healthyPlants => 'स्वस्थ पौधे';
@@ -124,7 +185,40 @@ class AppLocalizationsHi extends AppLocalizations {
   String get affectedPlants => 'प्रभावित पौधे';
 
   @override
-  String get cropWheat => 'गेहूं';
+  String get cropDetailsTitle => 'फ़सल का विवरण';
+
+  @override
+  String get markAffected => 'प्रभावित के रूप में चिह्नित करें';
+
+  @override
+  String get markHealthy => 'स्वस्थ के रूप में चिह्नित करें';
+
+  @override
+  String get settings => 'सेटिंग्स';
+
+  @override
+  String get farmDetails => 'खेत का विवरण';
+
+  @override
+  String get language => 'भाषा';
+
+  @override
+  String get saveFarmChanges => 'खेत के बदलाव सहेजें';
+
+  @override
+  String get logOut => 'लॉग आउट';
+
+  @override
+  String get selectLanguage => 'भाषा चुनें';
+
+  @override
+  String get detailsUpdatedMessage => 'विवरण सफलतापूर्वक अपडेट किया गया!';
+
+  @override
+  String get selectCropType => 'फ़सल का प्रकार चुनें';
+
+  @override
+  String get cropWheat => 'गेहूँ';
 
   @override
   String get cropMaize => 'मक्का';
@@ -137,52 +231,4 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get cropPotato => 'आलू';
-
-  @override
-  String get plantsPerRow => 'प्रति पंक्ति पौधे';
-
-  @override
-  String get toolsAndAnalytics => 'उपकरण और विश्लेषण';
-
-  @override
-  String get viewPreviousReports => 'पिछली रिपोर्टें देखें';
-
-  @override
-  String get scanNewPlant => 'एक नया पौधा स्कैन करें';
-
-  @override
-  String get cropDetailsTitle => 'फसल का विवरण';
-
-  @override
-  String get markAffected => 'प्रभावित के रूप में चिह्नित करें';
-
-  @override
-  String get markHealthy => 'स्वस्थ के रूप में चिह्नित करें';
-
-  @override
-  String get close => 'बंद करें';
-
-  @override
-  String get welcomeMessage => 'नमस्ते,';
-
-  @override
-  String get settings => 'सेटिंग्स';
-
-  @override
-  String get farmDetails => 'खेत का विवरण';
-
-  @override
-  String get language => 'भाषा';
-
-  @override
-  String get saveFarmChanges => 'बदलाव सहेजें';
-
-  @override
-  String get logOut => 'लॉग आउट';
-
-  @override
-  String get selectLanguage => 'भाषा चुने';
-
-  @override
-  String get detailsUpdatedMessage => 'विवरण सफलतापूर्वक अपडेट किया गया!';
 }

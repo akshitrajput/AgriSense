@@ -1,10 +1,12 @@
 import 'dart:math';
+import 'package:agrisense/providers/farm_data_provider.dart';
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 
-// --- From Code 2: Data model for a single crop ---
 class Crop {
   final int id;
   bool isHealthy;
@@ -13,9 +15,7 @@ class Crop {
   Crop({required this.id, this.isHealthy = true, required this.details});
 }
 
-// --- Merged: Now a StatefulWidget to handle the interactive state ---
 class FarmMapScreen extends StatefulWidget {
-  // --- From Code 2: Accepts dynamic farm data ---
   final double farmLength;
   final double farmWidth;
   final int rows;
@@ -35,49 +35,71 @@ class FarmMapScreen extends StatefulWidget {
 
 class _FarmMapScreenState extends State<FarmMapScreen> {
   late List<List<Crop>> _farmData;
-  final TransformationController _transformationController =
-      TransformationController();
+  final TransformationController _transformationController = TransformationController();
+  String _cropDisplayName = 'N/A';
 
   @override
   void initState() {
     super.initState();
-    _initializeFarmData();
+    // Initialize data after the first frame to safely access context
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeFarmData();
+    });
   }
 
-  // --- From Code 2: Logic to create the farm grid data ---
   void _initializeFarmData() {
-    _farmData = List.generate(
-      widget.rows,
-      (rowIndex) => List.generate(widget.plantsPerRow, (plantIndex) {
-        int id = rowIndex * widget.plantsPerRow + plantIndex;
-        return Crop(
-          id: id,
-          details:
-              'Crop $id - Row: ${rowIndex + 1}, Plant: ${plantIndex + 1}\n'
-              'Type: Wheat\n'
-              'Last Inspected: 2025-09-21\n'
-              'Soil Moisture: 65%\n'
-              'Pest Status: None detected',
-        );
-      }),
-    );
+    final farmData = context.read<FarmDataProvider>().farmData;
+    final localizations = AppLocalizations.of(context)!;
+
+    // Get the translated crop name from the provider data
+    final String? cropKey = farmData['cropTypeKey'];
+    if (cropKey != null) {
+      final Map<String, String> translatedCrops = {
+        'wheat': localizations.cropWheat,
+        'maize': localizations.cropMaize,
+        'corn': localizations.cropCorn,
+        'tomato': localizations.cropTomato,
+        'potato': localizations.cropPotato,
+      };
+      _cropDisplayName = translatedCrops[cropKey] ?? 'N/A';
+    }
+
+    setState(() {
+      _farmData = List.generate(
+        widget.rows,
+            (rowIndex) => List.generate(widget.plantsPerRow, (plantIndex) {
+          int id = rowIndex * widget.plantsPerRow + plantIndex;
+          return Crop(
+            id: id,
+            details: 'Crop $id - Row: ${rowIndex + 1}, Plant: ${plantIndex + 1}\n'
+                'Type: $_cropDisplayName\n' // Use dynamic crop name
+                'Last Inspected: 2025-09-22\n'
+                'Soil Moisture: 65%\n'
+                'Pest Status: None detected',
+          );
+        }),
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
 
+    // Show a loading indicator until farm data is initialized
+    if (_farmData == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
       appBar: CustomAppBar(
         title: localizations.farmMapView,
         hasBackButton: true,
       ),
-      // --- From Code 1: The background UI structure ---
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
         child: Column(
           children: [
-            // The card now contains the interactive map
             Expanded(child: _buildMapCard()),
             const SizedBox(height: 20),
             _buildLegend(localizations),
@@ -90,18 +112,16 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
   Widget _buildMapCard() {
     return Card(
       elevation: 2,
-      clipBehavior: Clip.antiAlias, // Important for InteractiveViewer
+      clipBehavior: Clip.antiAlias,
       shadowColor: AppTheme.primaryColor.withOpacity(0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: AppTheme.borderColor, width: 1),
       ),
-      // --- From Code 2: The interactive grid is now the child of the card ---
       child: _buildFarmGrid(),
     );
   }
 
-  // --- From Code 2: The InteractiveViewer for zoom/pan functionality ---
   Widget _buildFarmGrid() {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -126,7 +146,7 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
                 widget.rows,
-                (rowIndex) => _FarmRow(
+                    (rowIndex) => _FarmRow(
                   crops: _farmData[rowIndex],
                   onCropTap: (crop) => _showCropDetails(context, crop),
                 ),
@@ -138,7 +158,6 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
     );
   }
 
-  // --- From Code 2: The pop-up dialog, now localized ---
   void _showCropDetails(BuildContext context, Crop crop) {
     final localizations = AppLocalizations.of(context)!;
     showDialog(
@@ -152,7 +171,16 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
             onPressed: () {
               setState(() {
                 crop.isHealthy = !crop.isHealthy;
-                // You can update other details here as well
+
+                // Get today's date and format it
+                final String formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+                // Update the details string with the new health status and today's date
+                crop.details = 'Crop ${crop.id} - Row: ${rowIndex(crop.id)} Plant: ${plantIndex(crop.id)}\n'
+                    'Type: $_cropDisplayName\n'
+                    'Last Inspected: $formattedDate\n' // Use current date
+                    'Soil Moisture: 62%\n'
+                    'Pest Status: ${crop.isHealthy ? 'None detected' : 'Disease suspected!'}';
               });
               Navigator.of(context).pop(); // Close the dialog
             },
@@ -171,7 +199,10 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
     );
   }
 
-  // --- From Code 1: The legend UI ---
+  // Helper functions to calculate row and plant index from ID
+  int rowIndex(int id) => id ~/ widget.plantsPerRow + 1;
+  int plantIndex(int id) => id % widget.plantsPerRow + 1;
+
   Widget _buildLegend(AppLocalizations localizations) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -190,7 +221,6 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
   }
 }
 
-// --- From Code 2: The interactive row with tap handling ---
 class _FarmRow extends StatelessWidget {
   final List<Crop> crops;
   final ValueChanged<Crop> onCropTap;
@@ -223,7 +253,6 @@ class _FarmRow extends StatelessWidget {
   }
 }
 
-// --- From Code 1: The legend item UI style ---
 class _LegendItem extends StatelessWidget {
   final Color color;
   final String label;
@@ -241,3 +270,4 @@ class _LegendItem extends StatelessWidget {
     );
   }
 }
+

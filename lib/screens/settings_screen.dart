@@ -1,7 +1,8 @@
 import 'package:agrisense/l10n/app_localizations.dart';
 import 'package:agrisense/providers/farm_data_provider.dart';
 import 'package:agrisense/providers/language_provider.dart';
-import 'package:agrisense/screens/onboarding_screen.dart';
+import 'package:agrisense/screens/info_profile_screen.dart';
+import 'package:agrisense/services/local_storage_service.dart';
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -16,16 +17,16 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final _formKey = GlobalKey<FormState>();
+  late TextEditingController _nameController;
   late TextEditingController _lengthController;
   late TextEditingController _breadthController;
   late TextEditingController _rowsController;
   late TextEditingController _plantsPerRowController;
-  final TextEditingController _languageSearchController = TextEditingController();
-  final TextEditingController _cropSearchController = TextEditingController();
+  final _languageSearchController = TextEditingController();
+  final _cropSearchController = TextEditingController();
 
   String? _selectedCropKey;
   Map<String, String> _translatedCrops = {};
-
   Language? _selectedLanguage;
   final List<Language> _languages = [
     Language('en', 'English'),
@@ -36,15 +37,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    final farmData = Provider.of<FarmDataProvider>(context, listen: false).farmData;
-    final langProvider = Provider.of<LanguageProvider>(context, listen: false);
-
+    final farmData = context.read<FarmDataProvider>().farmData;
+    final langProvider = context.read<LanguageProvider>();
+    _nameController = TextEditingController(text: farmData['name'] ?? '');
     _lengthController = TextEditingController(text: farmData['farmLength']?.toString() ?? '');
     _breadthController = TextEditingController(text: farmData['farmBreadth']?.toString() ?? '');
     _rowsController = TextEditingController(text: farmData['rows']?.toString() ?? '');
     _plantsPerRowController = TextEditingController(text: farmData['plantsPerRow']?.toString() ?? '');
     _selectedCropKey = farmData['cropTypeKey'];
-    
     _selectedLanguage = _languages.firstWhere((lang) => lang.code == langProvider.appLocale.languageCode, orElse: () => _languages.first);
   }
 
@@ -52,18 +52,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final localizations = AppLocalizations.of(context)!;
-    
     _translatedCrops = {
-      'wheat': localizations.cropWheat,
-      'maize': localizations.cropMaize,
-      'corn': localizations.cropCorn,
-      'tomato': localizations.cropTomato,
-      'potato': localizations.cropPotato,
+      'wheat': localizations.cropWheat, 'maize': localizations.cropMaize, 'corn': localizations.cropCorn,
+      'tomato': localizations.cropTomato, 'potato': localizations.cropPotato,
     };
   }
 
   @override
   void dispose() {
+    _nameController.dispose();
     _lengthController.dispose();
     _breadthController.dispose();
     _rowsController.dispose();
@@ -73,98 +70,92 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.dispose();
   }
 
-  void _saveFarmChanges() {
+  void _saveFarmChanges() async {
     if (_formKey.currentState!.validate()) {
-      final farmDataProvider = Provider.of<FarmDataProvider>(context, listen: false);
+      final farmDataProvider = context.read<FarmDataProvider>();
       final localizations = AppLocalizations.of(context)!;
       final newFarmData = Map<String, dynamic>.from(farmDataProvider.farmData);
 
+      newFarmData['name'] = _nameController.text;
       newFarmData['cropTypeKey'] = _selectedCropKey;
       newFarmData['farmLength'] = double.tryParse(_lengthController.text) ?? 0.0;
       newFarmData['farmBreadth'] = double.tryParse(_breadthController.text) ?? 0.0;
       newFarmData['rows'] = int.tryParse(_rowsController.text) ?? 0;
       newFarmData['plantsPerRow'] = int.tryParse(_plantsPerRowController.text) ?? 0;
 
-      farmDataProvider.updateFarmData(newFarmData);
+      await farmDataProvider.updateFarmData(newFarmData);
 
-      // --- CHANGE: Improved SnackBar implementation ---
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle_outline, color: Colors.white),
-              const SizedBox(width: 16),
-              Expanded(child: Text(localizations.detailsUpdatedMessage)),
-            ],
-          ),
-          backgroundColor: AppTheme.primaryColor, // Use primary color
-          behavior: SnackBarBehavior.floating, // Make it float
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.all(16),
+          content: Text(localizations.detailsUpdatedMessage),
+          backgroundColor: AppTheme.primaryColor,
         ),
       );
       Navigator.of(context).pop();
     }
   }
-  
-  void _logout() {
+
+  void _logout() async {
+    // Use the centralized service to clear all app data
+    await LocalStorageService.clearAllData();
+
+    // Also clear the data from the provider in memory
+    context.read<FarmDataProvider>().clearData();
+
+    if (!mounted) return;
+
+    // Navigate to the very first screen for new users, clearing all other screens
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const OnboardingScreen()),
-      (Route<dynamic> route) => false,
+      MaterialPageRoute(builder: (context) => const InfoProfileScreen()),
+          (Route<dynamic> route) => false,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-
     return Scaffold(
       appBar: CustomAppBar(title: localizations.settings, hasBackButton: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(localizations.farmDetails, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-              _buildCropDropdown(localizations),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(child: _buildTextFormField(controller: _lengthController, label: localizations.length)),
-                  const SizedBox(width: 16),
-                  Expanded(child: _buildTextFormField(controller: _breadthController, label: localizations.breadth)),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(child: _buildTextFormField(controller: _rowsController, label: localizations.numberOfRows)),
-                  const SizedBox(width: 16),
-                  Expanded(child: _buildTextFormField(controller: _plantsPerRowController, label: localizations.plantsPerRow)),
-                ],
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(onPressed: _saveFarmChanges, child: Text(localizations.saveFarmChanges)),
-              const Divider(height: 48),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text(localizations.farmDetails, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            _buildTextFormField(controller: _nameController, label: localizations.yourName),
+            const SizedBox(height: 16),
+            _buildCropDropdown(localizations),
+            const SizedBox(height: 16),
+            Row(children: [
+              Expanded(child: _buildTextFormField(controller: _lengthController, label: localizations.length)),
+              const SizedBox(width: 16),
+              Expanded(child: _buildTextFormField(controller: _breadthController, label: localizations.breadth)),
+            ]),
+            const SizedBox(height: 16),
+            Row(children: [
+              Expanded(child: _buildTextFormField(controller: _rowsController, label: localizations.numberOfRows)),
+              const SizedBox(width: 16),
+              Expanded(child: _buildTextFormField(controller: _plantsPerRowController, label: localizations.plantsPerRow)),
+            ]),
+            const SizedBox(height: 24),
+            ElevatedButton(onPressed: _saveFarmChanges, child: Text(localizations.saveFarmChanges)),
+            const Divider(height: 48),
 
-              Text(localizations.language, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-              _buildLanguageDropdown(localizations),
-              const Divider(height: 48),
+            Text(localizations.language, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            _buildLanguageDropdown(localizations),
+            const Divider(height: 48),
 
-              OutlinedButton.icon(
-                onPressed: _logout,
-                icon: const Icon(Icons.logout),
-                label: Text(localizations.logOut),
-                style: OutlinedButton.styleFrom(foregroundColor: AppTheme.affectedColor, side: const BorderSide(color: AppTheme.affectedColor)),
-              )
-            ],
-          ),
+            OutlinedButton.icon(
+              onPressed: _logout,
+              icon: const Icon(Icons.logout),
+              label: Text(localizations.logOut),
+              style: OutlinedButton.styleFrom(foregroundColor: AppTheme.affectedColor, side: const BorderSide(color: AppTheme.affectedColor)),
+            )
+          ]),
         ),
       ),
     );
@@ -173,16 +164,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildTextFormField({required TextEditingController controller, required String label}) {
     return TextFormField(
       controller: controller,
-      keyboardType: TextInputType.number,
-      decoration: InputDecoration(
-        labelText: label,
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.borderColor),
-        ),
-      ),
+      keyboardType: label == AppLocalizations.of(context)!.yourName ? TextInputType.text : TextInputType.number,
+      decoration: InputDecoration(labelText: label),
       validator: (value) => value!.isEmpty ? 'This field cannot be empty' : null,
     );
   }
@@ -191,25 +174,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return DropdownButtonHideUnderline(
       child: DropdownButton2<String>(
         isExpanded: true,
-        hint: Text(localizations.selectCropType, style: TextStyle(fontSize: 14, color: Theme.of(context).hintColor)),
-        items: _translatedCrops.entries.map((entry) {
-          return DropdownMenuItem<String>(
-            value: entry.key,
-            child: Text(entry.value, style: const TextStyle(fontSize: 14)),
-          );
-        }).toList(),
+        hint: Text(localizations.selectCropType),
+        items: _translatedCrops.entries.map((e) => DropdownMenuItem<String>(value: e.key, child: Text(e.value, style: const TextStyle(fontSize: 14)))).toList(),
         value: _selectedCropKey,
-        onChanged: (String? value) {
-          setState(() {
-            _selectedCropKey = value;
-          });
-        },
-        buttonStyleData: ButtonStyleData(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          height: 50,
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppTheme.borderColor)),
-        ),
-        dropdownStyleData: DropdownStyleData(maxHeight: 200, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12))),
+        onChanged: (v) => setState(() => _selectedCropKey = v),
+        buttonStyleData: ButtonStyleData(height: 55, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppTheme.borderColor))),
+        dropdownStyleData: DropdownStyleData(decoration: BoxDecoration(borderRadius: BorderRadius.circular(12))),
         menuItemStyleData: const MenuItemStyleData(height: 40),
         dropdownSearchData: DropdownSearchData(
           searchController: _cropSearchController,
@@ -243,27 +213,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildLanguageDropdown(AppLocalizations localizations) {
-    final languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    final languageProvider = context.read<LanguageProvider>();
     return DropdownButtonHideUnderline(
       child: DropdownButton2<Language>(
         isExpanded: true,
-        hint: Text(localizations.selectLanguage, style: TextStyle(fontSize: 14, color: Theme.of(context).hintColor)),
-        items: _languages.map((Language item) => DropdownMenuItem<Language>(value: item, child: Text(item.name, style: const TextStyle(fontSize: 14)))).toList(),
+        hint: Text(localizations.selectLanguage),
+        items: _languages.map((l) => DropdownMenuItem<Language>(value: l, child: Text(l.name, style: const TextStyle(fontSize: 14)))).toList(),
         value: _selectedLanguage,
-        onChanged: (Language? language) {
-          if (language != null) {
+        onChanged: (l) {
+          if (l != null) {
             setState(() {
-              _selectedLanguage = language;
+              _selectedLanguage = l;
+              _selectedCropKey = null;
             });
-            languageProvider.changeLanguage(Locale(language.code));
+            languageProvider.changeLanguage(Locale(l.code));
           }
         },
-        buttonStyleData: ButtonStyleData(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          height: 50,
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppTheme.borderColor)),
-        ),
-        dropdownStyleData: DropdownStyleData(maxHeight: 200, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12))),
+        buttonStyleData: ButtonStyleData(height: 55, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppTheme.borderColor))),
+        dropdownStyleData: DropdownStyleData(decoration: BoxDecoration(borderRadius: BorderRadius.circular(12))),
         menuItemStyleData: const MenuItemStyleData(height: 40),
         dropdownSearchData: DropdownSearchData(
           searchController: _languageSearchController,
@@ -294,7 +261,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
-// Re-using the Language class from onboarding
 class Language {
   final String code;
   final String name;
@@ -302,3 +268,4 @@ class Language {
   @override
   String toString() => name;
 }
+
