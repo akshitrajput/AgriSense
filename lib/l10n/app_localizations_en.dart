@@ -232,4 +232,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cropPotato => 'Potato';
+
+  @override
+  String get scanHistory => 'Scan History';
+
+  @override
+  String get noHistoryRecords => 'No history records found.';
+
+  @override
+  String get onboardingTitle => 'Cultivating Your Profile';
+
+  @override
+  String get onboardingSubtitle => 'Let\'s begin your harvest.';
 }

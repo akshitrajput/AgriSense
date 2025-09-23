@@ -1,79 +1,58 @@
 import 'dart:async';
 import 'package:agrisense/providers/farm_data_provider.dart';
 import 'package:agrisense/screens/dashboard_screen.dart';
-import 'package:agrisense/screens/info_profile_screen.dart';
+import 'package:agrisense/screens/info_profile_screen.dart'; // CHANGE: Import InfoProfileScreen
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
-
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkLoginStatusAndNavigate();
+    _checkOnboardingStatus();
   }
 
-  Future<void> _checkLoginStatusAndNavigate() async {
-    // Wait for the splash screen's minimum duration
-    await Future.delayed(const Duration(seconds: 3));
-
-    // Access the provider. We use `read` as this is a one-time action inside initState.
+  Future<void> _checkOnboardingStatus() async {
+    // This allows the provider to load its data from storage first
     final farmDataProvider = context.read<FarmDataProvider>();
-
-    // If the provider is still loading data from the database, wait for it.
-    // This is crucial to prevent navigating before the login status is known.
-    while (farmDataProvider.isLoading) {
-      await Future.delayed(const Duration(milliseconds: 100));
+    
+    // Wait until the provider is no longer in its initial loading state
+    if (farmDataProvider.isLoading) {
+      await Future.delayed(const Duration(milliseconds: 50));
     }
 
-    // This check must happen after the widget is built and still mounted.
-    if (!mounted) return;
+    // Add a minimum splash screen duration
+    await Future.delayed(const Duration(seconds: 3));
 
-    // The single source of truth: does farm data exist in the provider?
-    final bool isLoggedIn = farmDataProvider.farmData != null;
-
-    if (isLoggedIn) {
-      // If data exists, the user is logged in. Go to the Dashboard.
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const DashboardScreen()),
-            (Route<dynamic> route) => false, // Clears all previous routes
-      );
-    } else {
-      // If no data exists, start the full onboarding flow.
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const InfoProfileScreen()),
-            (Route<dynamic> route) => false, // Clears all previous routes
-      );
+    if (mounted) {
+      if (farmDataProvider.hasOnboarded) {
+        // If user has onboarded, go to Dashboard
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));
+      } else {
+        // If it's a new user, go to InfoProfileScreen first
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const InfoProfileScreen()));
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: AppTheme.primaryColor,
+      backgroundColor: AppTheme.backgroundColor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.agriculture_outlined, size: 100, color: Colors.white),
-            SizedBox(height: 20),
-            Text(
-              'AgriSense',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
+            Icon(Icons.eco_outlined, size: 120, color: AppTheme.primaryColor),
+            SizedBox(height: 24),
+            Text('AgriSense', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
           ],
         ),
       ),

@@ -88,6 +88,10 @@
     "cropMaize": "மக்காச்சோளம்",
     "cropCorn": "சோளம்",
     "cropTomato": "தக்காளி",
-    "cropPotato": "உருளைக்கிழங்கு"
+    "cropPotato": "உருளைக்கிழங்கு",
+    "scanHistory": "ஸ்கேன் வரலாறு",
+    "noHistoryRecords": "வரலாற்றுப் பதிவுகள் எதுவும் இல்லை.",
+    "onboardingTitle": "உங்கள் சுயவிவரத்தை வளர்க்கவும்",
+    "onboardingSubtitle": "உங்கள் அறுவடையைத் தொடங்குவோம்."
 }
 

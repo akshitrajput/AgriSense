@@ -231,4 +231,16 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get cropPotato => 'आलू';
+
+  @override
+  String get scanHistory => 'स्कैन इतिहास';
+
+  @override
+  String get noHistoryRecords => 'कोई इतिहास रिकॉर्ड नहीं मिला।';
+
+  @override
+  String get onboardingTitle => 'अपनी प्रोफ़ाइल विकसित करें';
+
+  @override
+  String get onboardingSubtitle => 'चलिए आपकी फसल शुरू करते हैं।';
 }

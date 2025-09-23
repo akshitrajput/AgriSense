@@ -234,4 +234,16 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get cropPotato => 'உருளைக்கிழங்கு';
+
+  @override
+  String get scanHistory => 'ஸ்கேன் வரலாறு';
+
+  @override
+  String get noHistoryRecords => 'வரலாற்றுப் பதிவுகள் எதுவும் இல்லை.';
+
+  @override
+  String get onboardingTitle => 'உங்கள் சுயவிவரத்தை வளர்க்கவும்';
+
+  @override
+  String get onboardingSubtitle => 'உங்கள் அறுவடையைத் தொடங்குவோம்.';
 }

@@ -1,9 +1,8 @@
 import 'package:agrisense/models/daily_forecast.dart';
 import 'package:agrisense/models/farm_data.dart';
-import 'package:agrisense/models/health_report.dart';
 import 'package:agrisense/providers/farm_data_provider.dart';
 import 'package:agrisense/screens/farm_map_screen.dart';
-import 'package:agrisense/screens/health_report_screen.dart';
+import 'package:agrisense/screens/history_screen.dart';
 import 'package:agrisense/screens/plant_scan_screen.dart';
 import 'package:agrisense/screens/settings_screen.dart';
 import 'package:agrisense/services/weather_service.dart';
@@ -34,11 +33,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final farmData = context.watch<FarmDataProvider>().farmData!;
+    final farmData = context.watch<FarmDataProvider>().farmData;
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: '${localizations.welcomeMessage} ${farmData.name ?? ''}!',
+        title: '${localizations.welcomeMessage} ${farmData.name}',
         actions: [
           IconButton(
             onPressed: () {
@@ -69,7 +68,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // --- UI IMPROVEMENT 1: The main card now distributes its children evenly. ---
   Widget _buildWeatherForecastCard() {
     return Card(
       elevation: 2,
@@ -79,7 +77,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "3-Day Forecast",
+              "7-Day Forecast",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -102,13 +100,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   );
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   final forecasts = snapshot.data!;
-                  // Use a Row with spaceAround alignment to distribute the 3 items.
-                  // No scrolling is needed.
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: forecasts
-                        .map((forecast) => _buildDailyForecastItem(forecast))
-                        .toList(),
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: forecasts
+                          .map((forecast) => _buildDailyForecastItem(forecast))
+                          .toList(),
+                    ),
                   );
                 } else {
                   return const Center(
@@ -123,63 +122,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // --- UI IMPROVEMENT 2: Each forecast item is now a more detailed card. ---
   Widget _buildDailyForecastItem(DailyForecast forecast) {
     final String iconUrl = 'https:${forecast.weatherIconCode}';
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(
-          horizontal: 4.0,
-        ), // Add spacing between cards
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-        decoration: BoxDecoration(
-          color: AppTheme.backgroundColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              DateFormat('EEE').format(forecast.dateTime), // e.g., "Mon"
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+    return Container(
+      width: 80,
+      margin: const EdgeInsets.symmetric(horizontal: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            DateFormat('EEE').format(forecast.dateTime),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const SizedBox(height: 8),
+          Image.network(
+            iconUrl,
+            width: 50,
+            height: 50,
+            errorBuilder: (context, error, stackTrace) => const Icon(
+              Icons.cloud_off,
+              color: AppTheme.subTextColor,
+              size: 40,
             ),
-            const SizedBox(height: 8),
-            Image.network(
-              iconUrl,
-              width: 50, // Larger icon
-              height: 50,
-              errorBuilder: (context, error, stackTrace) => const Icon(
-                Icons.cloud_off,
-                color: AppTheme.subTextColor,
-                size: 40,
-              ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '${forecast.temp.round()}°C',
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
             ),
-            const SizedBox(height: 8),
-            Text(
-              '${forecast.temp.round()}°C',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ), // Larger temperature
-            ),
-            const SizedBox(height: 4),
-            Text(
-              forecast.weatherDescription,
-              textAlign: TextAlign.center,
-              maxLines: 2, // Allow wrapping for longer descriptions
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppTheme.subTextColor,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-
-  // --- All other widgets below remain unchanged ---
 
   Widget _buildFarmSummaryCard(
     AppLocalizations localizations,
@@ -218,13 +200,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _buildSummaryRow(
               Icons.aspect_ratio_outlined,
               localizations.area,
-              '${farmData.farmLength ?? 0}m × ${farmData.farmBreadth ?? 0}m',
+              '${farmData.farmLength}m × ${farmData.farmBreadth}m',
             ),
             const SizedBox(height: 12),
             _buildSummaryRow(
               Icons.format_list_numbered,
               localizations.rows,
-              '${farmData.rows ?? 0}',
+              '${farmData.rows}',
             ),
           ],
         ),
@@ -348,10 +330,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               context,
               MaterialPageRoute(
                 builder: (context) => FarmMapScreen(
-                  farmLength: farmData.farmLength ?? 0.0,
-                  farmWidth: farmData.farmBreadth ?? 0.0,
-                  rows: farmData.rows ?? 0,
-                  plantsPerRow: farmData.plantsPerRow ?? 0,
+                  farmLength: farmData.farmLength,
+                  farmWidth: farmData.farmBreadth,
+                  rows: farmData.rows,
+                  plantsPerRow: farmData.plantsPerRow,
                 ),
               ),
             );
@@ -362,17 +344,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SizedBox(height: 12),
         OutlinedButton.icon(
           onPressed: () {
-            final placeholderReport = HealthReport(
-              diagnosis: "Fungal Leaf Blight",
-              severity: "High",
-              affectedArea: "35%",
-              recommendedAction: "Apply fungicide and monitor.",
-            );
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    HealthReportScreen(report: placeholderReport),
+                builder: (context) => const HistoryScreen(),
               ),
             );
           },

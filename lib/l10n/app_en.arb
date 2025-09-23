@@ -88,6 +88,10 @@
     "cropMaize": "Maize",
     "cropCorn": "Corn",
     "cropTomato": "Tomato",
-    "cropPotato": "Potato"
+    "cropPotato": "Potato",
+    "scanHistory": "Scan History",
+    "noHistoryRecords": "No history records found.",
+    "onboardingTitle": "Cultivating Your Profile",
+    "onboardingSubtitle": "Let's begin your harvest."
 }
 

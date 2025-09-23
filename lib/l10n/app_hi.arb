@@ -88,6 +88,10 @@
     "cropMaize": "मक्का",
     "cropCorn": "भुट्टा",
     "cropTomato": "टमाटर",
-    "cropPotato": "आलू"
+    "cropPotato": "आलू",
+    "scanHistory": "स्कैन इतिहास",
+    "noHistoryRecords": "कोई इतिहास रिकॉर्ड नहीं मिला।",
+    "onboardingTitle": "अपनी प्रोफ़ाइल विकसित करें",
+    "onboardingSubtitle": "चलिए आपकी फसल शुरू करते हैं।"
 }
 

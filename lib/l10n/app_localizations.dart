@@ -537,6 +537,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Potato'**
   String get cropPotato;
+
+  /// No description provided for @scanHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan History'**
+  String get scanHistory;
+
+  /// No description provided for @noHistoryRecords.
+  ///
+  /// In en, this message translates to:
+  /// **'No history records found.'**
+  String get noHistoryRecords;
+
+  /// No description provided for @onboardingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cultivating Your Profile'**
+  String get onboardingTitle;
+
+  /// No description provided for @onboardingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s begin your harvest.'**
+  String get onboardingSubtitle;
 }
 
 class _AppLocalizationsDelegate
