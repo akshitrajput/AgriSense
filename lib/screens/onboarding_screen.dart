@@ -1,5 +1,5 @@
 import 'package:agrisense/providers/farm_data_provider.dart';
-import 'package:agrisense/screens/dashboard_screen.dart';
+import 'package:agrisense/screens/main_screen.dart'; // FIX: Import MainScreen
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
@@ -53,9 +53,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       await farmDataProvider.updateFarmData(farmData);
 
       if (mounted) {
+        // FIX: Navigate to MainScreen instead of DashboardScreen
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const DashboardScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
         );
       }
     }
@@ -107,7 +108,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  // CHANGE: The form fields are now grouped inside a Card for a consistent UI
                   Card(
                     elevation: 2,
                     shadowColor: AppTheme.primaryColor.withOpacity(0.1),
@@ -124,7 +124,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           children: [
                             _buildDimensionFields(localizations),
                             const SizedBox(height: 16),
-                            _buildPlantationFields(localizations),
+                            _buildTextFormField(
+                              controller: _rowsController,
+                              hintText: localizations.numberOfRows,
+                              icon: Icons.format_list_numbered,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextFormField(
+                              controller: _plantsPerRowController,
+                              hintText: localizations.plantsPerRow,
+                              icon: Icons.grass_outlined,
+                            ),
                             const SizedBox(height: 16),
                             _buildCropDropdown(localizations, translatedCrops),
                           ],
@@ -154,6 +164,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             controller: _lengthController,
             hintText: localizations.length,
             icon: Icons.straighten_outlined,
+            hintFontSize: 12.0,
           ),
         ),
         const SizedBox(width: 16),
@@ -162,28 +173,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             controller: _breadthController,
             hintText: localizations.breadth,
             icon: Icons.swap_horiz_outlined,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPlantationFields(AppLocalizations localizations) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildTextFormField(
-            controller: _rowsController,
-            hintText: localizations.numberOfRows,
-            icon: Icons.format_list_numbered,
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: _buildTextFormField(
-            controller: _plantsPerRowController,
-            hintText: localizations.plantsPerRow,
-            icon: Icons.grass_outlined,
+            hintFontSize: 12.0,
           ),
         ),
       ],
@@ -194,23 +184,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     required TextEditingController controller,
     required String hintText,
     required IconData icon,
+    double? hintFontSize,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
         hintText: hintText,
+        hintStyle:
+        hintFontSize != null ? TextStyle(fontSize: hintFontSize) : null,
         prefixIcon: Icon(icon, color: AppTheme.subTextColor),
       ),
       validator: (value) =>
-          value!.trim().isEmpty ? 'This field is required' : null,
+      value!.trim().isEmpty ? 'This field is required' : null,
     );
   }
 
   Widget _buildCropDropdown(
-    AppLocalizations localizations,
-    Map<String, String> translatedCrops,
-  ) {
+      AppLocalizations localizations,
+      Map<String, String> translatedCrops,
+      ) {
     return DropdownButtonHideUnderline(
       child: DropdownButton2<String>(
         isExpanded: true,
@@ -287,3 +280,4 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
+

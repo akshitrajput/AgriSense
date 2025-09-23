@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:agrisense/providers/farm_data_provider.dart';
-import 'package:agrisense/screens/dashboard_screen.dart';
 import 'package:agrisense/screens/info_profile_screen.dart';
+import 'package:agrisense/screens/main_screen.dart';
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,22 +21,24 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigateToNextScreen() async {
-    // Wait for a fixed duration for the splash animation
+    // Wait for the splash animation to be visible
     await Future.delayed(const Duration(seconds: 3));
 
     if (mounted) {
-      // Check the provider to see if the user has completed onboarding before
       final farmDataProvider = context.read<FarmDataProvider>();
-      
-      // The provider loads data in its constructor, we wait a moment for it to complete
-      // in a real app you might have a more robust loading check.
+
+      // **THE FIX IS HERE:**
+      // We will now wait until the provider's `isLoading` flag becomes false.
+      // This guarantees that we don't check for onboarding status until
+      // the data has been loaded from storage.
       while (farmDataProvider.isLoading) {
-        await Future.delayed(const Duration(milliseconds: 50));
+        await Future.delayed(const Duration(milliseconds: 100));
       }
 
+      // Now that we are sure the data has been loaded, we can safely check the flag
       if (farmDataProvider.hasOnboarded) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const DashboardScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
         );
       } else {
         Navigator.of(context).pushReplacement(
@@ -49,14 +51,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.primaryColor, // Primary color background
+      backgroundColor: AppTheme.primaryColor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // CHANGE: Replaced Image.asset with a pre-built Icon
             const Icon(
-              Icons.agriculture, // This is the tractor icon
+              Icons.agriculture,
               size: 120,
               color: Colors.white,
             ),
@@ -82,3 +83,4 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
+

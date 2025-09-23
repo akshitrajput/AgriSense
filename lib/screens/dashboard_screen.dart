@@ -9,6 +9,7 @@ import 'package:agrisense/services/weather_service.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:agrisense/theme/app_theme.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
@@ -20,8 +21,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  bool isRoverActive = false;
-  bool isSprinklerActive = false;
   late Future<List<DailyForecast>> _forecastFuture;
 
   @override
@@ -35,7 +34,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final localizations = AppLocalizations.of(context)!;
     final farmData = context.watch<FarmDataProvider>().farmData;
 
+    if (context.watch<FarmDataProvider>().isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
+      // Use a background color for the whole screen
+      backgroundColor: AppTheme.backgroundColor,
       appBar: CustomAppBar(
         title: '${localizations.welcomeMessage} ${farmData.name}',
         actions: [
@@ -57,11 +62,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             _buildWeatherForecastCard(),
             const SizedBox(height: 24),
-            _buildFarmSummaryCard(localizations, farmData),
+            _buildHealthStatusCard(localizations),
             const SizedBox(height: 24),
-            _buildSmartControlsCard(localizations),
-            const SizedBox(height: 24),
-            _buildNavigationButtons(localizations, farmData),
+            _buildActionButtons(localizations, farmData),
           ],
         ),
       ),
@@ -70,7 +73,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildWeatherForecastCard() {
     return Card(
-      elevation: 2,
+      elevation: 4, // Increased elevation for a lifting effect
+      shadowColor: AppTheme.primaryColor.withOpacity(0.2),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -78,42 +83,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             const Text(
               "7-Day Forecast",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             FutureBuilder<List<DailyForecast>>(
               future: _forecastFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    heightFactor: 3,
-                    child: CircularProgressIndicator(
-                      color: AppTheme.primaryColor,
+                  return const SizedBox(
+                    height: 120, // Give it a fixed height while loading
+                    child: Center(
+                      child:
+                      CircularProgressIndicator(color: AppTheme.primaryColor),
                     ),
                   );
                 } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      'Error: ${snapshot.error}',
-                      style: const TextStyle(color: AppTheme.affectedColor),
+                  return SizedBox(
+                    height: 120,
+                    child: Center(
+                      child: Text(
+                        'Error: ${snapshot.error}',
+                        style: const TextStyle(color: AppTheme.affectedColor),
+                      ),
                     ),
                   );
-                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                  final forecasts = snapshot.data!;
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: forecasts
-                          .map((forecast) => _buildDailyForecastItem(forecast))
-                          .toList(),
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const SizedBox(
+                    height: 120,
+                    child: Center(
+                      child: Text('No forecast data available.'),
                     ),
-                  );
-                } else {
-                  return const Center(
-                    child: Text('No forecast data available.'),
                   );
                 }
+                final forecasts = snapshot.data!;
+                // **UI FIX:** Center the scrolling list vertically and horizontally
+                return SizedBox(
+                  height: 120,
+                  child: Center(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: forecasts
+                            .map((forecast) => _buildDailyForecastItem(forecast))
+                            .toList(),
+                      ),
+                    ),
+                  ),
+                );
               },
             ),
           ],
@@ -124,13 +141,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildDailyForecastItem(DailyForecast forecast) {
     final String iconUrl = 'https:${forecast.weatherIconCode}';
+
+    // **UI ENHANCEMENT:** Added more visual flair to each item
     return Container(
-      width: 80,
-      margin: const EdgeInsets.symmetric(horizontal: 4.0),
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      width: 85,
+      margin: const EdgeInsets.symmetric(horizontal: 6.0),
       decoration: BoxDecoration(
-        color: AppTheme.backgroundColor,
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white,
+            AppTheme.primaryColor.withOpacity(0.1),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryColor.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -142,219 +175,202 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 8),
           Image.network(
             iconUrl,
-            width: 50,
-            height: 50,
-            errorBuilder: (context, error, stackTrace) => const Icon(
-              Icons.cloud_off,
-              color: AppTheme.subTextColor,
-              size: 40,
-            ),
+            width: 45,
+            height: 45,
+            errorBuilder: (context, error, stackTrace) =>
+            const Icon(Icons.cloud_off, size: 40, color: AppTheme.subTextColor),
           ),
           const SizedBox(height: 8),
           Text(
             '${forecast.temp.round()}°C',
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFarmSummaryCard(
-    AppLocalizations localizations,
-    FarmData farmData,
-  ) {
-    String cropDisplay = 'N/A';
-    final String? cropKey = farmData.cropTypeKey;
-    if (cropKey != null) {
-      final Map<String, String> translatedCrops = {
-        'wheat': localizations.cropWheat,
-        'maize': localizations.cropMaize,
-        'corn': localizations.cropCorn,
-        'tomato': localizations.cropTomato,
-        'potato': localizations.cropPotato,
-      };
-      cropDisplay = translatedCrops[cropKey] ?? 'N/A';
-    }
+  Widget _buildHealthStatusCard(AppLocalizations localizations) {
+    final List<FlSpot> dummySpots = [
+      const FlSpot(0, 100), const FlSpot(1, 85), const FlSpot(2, 70),
+      const FlSpot(3, 80), const FlSpot(4, 90), const FlSpot(5, 95),
+    ];
+
     return Card(
-      elevation: 2,
+      elevation: 4,
+      shadowColor: AppTheme.primaryColor.withOpacity(0.2),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              localizations.farmSummary,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            const Text(
+              "Crop Health Status",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
-            _buildSummaryRow(
-              Icons.eco_outlined,
-              localizations.crop,
-              cropDisplay,
-            ),
-            const SizedBox(height: 12),
-            _buildSummaryRow(
-              Icons.aspect_ratio_outlined,
-              localizations.area,
-              '${farmData.farmLength}m × ${farmData.farmBreadth}m',
-            ),
-            const SizedBox(height: 12),
-            _buildSummaryRow(
-              Icons.format_list_numbered,
-              localizations.rows,
-              '${farmData.rows}',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSummaryRow(IconData icon, String title, String value) {
-    return Row(
-      children: [
-        Icon(icon, color: AppTheme.primaryColor, size: 20),
-        const SizedBox(width: 12),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 16, color: AppTheme.subTextColor),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            textAlign: TextAlign.end,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSmartControlsCard(AppLocalizations localizations) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              localizations.smartControls,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            _buildControlRow(
-              icon: Icons.precision_manufacturing_outlined,
-              label: localizations.autonomousRover,
-              isActive: isRoverActive,
-              onToggle: () => setState(() => isRoverActive = !isRoverActive),
-              localizations: localizations,
-            ),
-            const Divider(height: 24),
-            _buildControlRow(
-              icon: Icons.water_drop_outlined,
-              label: localizations.sprinklerSystem,
-              isActive: isSprinklerActive,
-              onToggle: () =>
-                  setState(() => isSprinklerActive = !isSprinklerActive),
-              localizations: localizations,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildControlRow({
-    required IconData icon,
-    required String label,
-    required bool isActive,
-    required VoidCallback onToggle,
-    required AppLocalizations localizations,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, color: AppTheme.primaryColor, size: 28),
-        const SizedBox(width: 16),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-        const Spacer(),
-        GestureDetector(
-          onTap: onToggle,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: isActive ? AppTheme.primaryColor : AppTheme.affectedColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              isActive ? localizations.on : localizations.off,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 180,
+              child: LineChart(
+                LineChartData(
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    getDrawingHorizontalLine: (val) {
+                      return const FlLine(
+                        color: AppTheme.borderColor,
+                        strokeWidth: 1,
+                      );
+                    },
+                  ),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 30,
+                        interval: 1,
+                        getTitlesWidget: bottomTitleWidgets,
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: 25,
+                        getTitlesWidget: leftTitleWidgets,
+                        reservedSize: 42,
+                      ),
+                    ),
+                  ),
+                  borderData: FlBorderData(
+                    show: true,
+                    border: Border.all(color: AppTheme.borderColor),
+                  ),
+                  minX: 0, maxX: 5, minY: 0, maxY: 100,
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: dummySpots,
+                      isCurved: true,
+                      gradient: const LinearGradient(
+                        colors: [AppTheme.primaryColor, Colors.green],
+                      ),
+                      barWidth: 5,
+                      isStrokeCapRound: true,
+                      dotData: const FlDotData(show: true),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        gradient: LinearGradient(
+                          colors: [
+                            AppTheme.primaryColor.withOpacity(0.3),
+                            Colors.green.withOpacity(0.0),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
-  Widget _buildNavigationButtons(
-    AppLocalizations localizations,
-    FarmData farmData,
-  ) {
+  Widget bottomTitleWidgets(double value, TitleMeta meta) {
+    const style = TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 12,
+      color: AppTheme.subTextColor,
+    );
+    Widget text;
+    switch (value.toInt()) {
+      case 0: text = const Text('Apr', style: style); break;
+      case 1: text = const Text('May', style: style); break;
+      case 2: text = const Text('Jun', style: style); break;
+      case 3: text = const Text('Jul', style: style); break;
+      case 4: text = const Text('Aug', style: style); break;
+      case 5: text = const Text('Sep', style: style); break;
+      default: text = const Text('', style: style); break;
+    }
+    return SideTitleWidget(axisSide: meta.axisSide, child: text);
+  }
+
+  Widget leftTitleWidgets(double value, TitleMeta meta) {
+    const style = TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 12,
+      color: AppTheme.subTextColor,
+    );
+    if (value.toInt() % 25 == 0) {
+      return Text('${value.toInt()}%', style: style, textAlign: TextAlign.left);
+    }
+    return Container();
+  }
+
+  Widget _buildActionButtons(AppLocalizations localizations, FarmData farmData) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          localizations.toolsAndAnalytics,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppTheme.textColor,
+        Padding(
+          padding: const EdgeInsets.only(left: 4.0, bottom: 16.0),
+          child: Text(
+            localizations.toolsAndAnalytics,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textColor,
+            ),
+          ),
+        ),
+        // **UI ENHANCEMENT:** Using a Card for better grouping of actions
+        Card(
+          elevation: 4,
+          shadowColor: AppTheme.primaryColor.withOpacity(0.2),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                _buildActionButtonRow(
+                  icon: Icons.map_outlined,
+                  label: localizations.viewFarmMap,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FarmMapScreen(
+                          farmLength: farmData.farmLength,
+                          farmWidth: farmData.farmBreadth,
+                          rows: farmData.rows,
+                          plantsPerRow: farmData.plantsPerRow,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 24),
+                _buildActionButtonRow(
+                  icon: Icons.article_outlined,
+                  label: localizations.viewPreviousReports,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HistoryScreen()),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 16),
-        OutlinedButton.icon(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => FarmMapScreen(
-                  farmLength: farmData.farmLength,
-                  farmWidth: farmData.farmBreadth,
-                  rows: farmData.rows,
-                  plantsPerRow: farmData.plantsPerRow,
-                ),
-              ),
-            );
-          },
-          icon: const Icon(Icons.map_outlined),
-          label: Text(localizations.viewFarmMap),
-        ),
-        const SizedBox(height: 12),
-        OutlinedButton.icon(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const HistoryScreen(),
-              ),
-            );
-          },
-          icon: const Icon(Icons.article_outlined),
-          label: Text(localizations.viewPreviousReports),
-        ),
-        const SizedBox(height: 12),
+        // **UI ENHANCEMENT:** Primary action button is more prominent
         ElevatedButton.icon(
           onPressed: () {
             Navigator.push(
@@ -362,10 +378,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
               MaterialPageRoute(builder: (context) => const PlantScanScreen()),
             );
           },
-          icon: const Icon(Icons.camera_alt_outlined),
-          label: Text(localizations.scanNewPlant),
+          icon: const Icon(Icons.camera_alt_outlined, color: Colors.white),
+          label: Text(localizations.scanNewPlant, style: const TextStyle(color: Colors.white)),
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            backgroundColor: AppTheme.primaryColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            elevation: 4,
+          ),
         ),
       ],
     );
   }
+
+  // Helper widget to create consistent rows for action buttons
+  Widget _buildActionButtonRow({required IconData icon, required String label, required VoidCallback onPressed}) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          children: [
+            Icon(icon, color: AppTheme.primaryColor, size: 28),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, color: AppTheme.subTextColor, size: 16),
+          ],
+        ),
+      ),
+    );
+  }
 }
+
