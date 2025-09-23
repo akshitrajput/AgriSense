@@ -45,10 +45,21 @@ class AgriSenseApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           debugShowCheckedModeBanner: false,
           locale: languageProvider.appLocale,
+          // CHANGE: Added all 14 supported languages
           supportedLocales: const [
-            Locale('en', ''),
-            Locale('hi', ''),
-            Locale('ta', ''),
+            Locale('en', ''), // English
+            Locale('hi', ''), // Hindi
+            Locale('ta', ''), // Tamil
+            Locale('bn', ''), // Bengali
+            Locale('te', ''), // Telugu
+            Locale('mr', ''), // Marathi
+            Locale('ur', ''), // Urdu
+            Locale('gu', ''), // Gujarati
+            Locale('kn', ''), // Kannada
+            Locale('or', ''), // Odia
+            Locale('ml', ''), // Malayalam
+            Locale('pa', ''), // Punjabi
+            Locale('as', ''), // Assamese
           ],
           localizationsDelegates: const [
             AppLocalizations.delegate,

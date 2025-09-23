@@ -9,6 +9,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+// Re-using the Language class from info_profile_screen
 class Language {
   final String code;
   final String name;
@@ -36,10 +37,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Map<String, String> _translatedCrops = {};
 
   Language? _selectedLanguage;
+  // CHANGE: Expanded the list to include all supported languages
   final List<Language> _languages = [
     Language('en', 'English'),
     Language('hi', 'हिन्दी (Hindi)'),
     Language('ta', 'தமிழ் (Tamil)'),
+    Language('pa', 'ਪੰਜਾਬੀ (Punjabi)'),
+    Language('gu', 'ગુજરાતી (Gujarati)'),
+    Language('kn', 'ಕನ್ನಡ (Kannada)'),
+    Language('bn', 'বাংলা (Bengali)'),
+    Language('ml', 'മലയാളം (Malayalam)'),
+    Language('mr', 'मराठी (Marathi)'),
+    Language('or', 'ଓଡ଼ିଆ (Odia)'),
+    Language('te', 'తెలుగు (Telugu)'),
   ];
 
   @override
@@ -61,6 +71,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final localizations = AppLocalizations.of(context)!;
+    
     _translatedCrops = {
       'wheat': localizations.cropWheat,
       'maize': localizations.cropMaize,
@@ -99,7 +110,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Farm details updated!'), backgroundColor: AppTheme.accentColor),
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle_outline, color: Colors.white),
+                const SizedBox(width: 16),
+                Expanded(child: Text(AppLocalizations.of(context)!.detailsUpdatedMessage)),
+              ],
+            ),
+            backgroundColor: AppTheme.primaryColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.all(16),
+          ),
         );
         Navigator.of(context).pop();
       }

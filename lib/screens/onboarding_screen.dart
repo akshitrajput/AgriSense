@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  // CHANGE: It now accepts the farmer's name from the previous screen
   final String farmerName;
 
   const OnboardingScreen({super.key, required this.farmerName});
@@ -37,10 +36,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Future<void> _createFarmProfile() async {
     if (_formKey.currentState!.validate()) {
-      final farmDataProvider = Provider.of<FarmDataProvider>(context, listen: false);
+      final farmDataProvider = Provider.of<FarmDataProvider>(
+        context,
+        listen: false,
+      );
 
       final Map<String, dynamic> farmData = {
-        'name': widget.farmerName, // Use the name from the previous screen
+        'name': widget.farmerName,
         'cropTypeKey': _selectedCropKey,
         'farmLength': double.tryParse(_lengthController.text) ?? 0.0,
         'farmBreadth': double.tryParse(_breadthController.text) ?? 0.0,
@@ -72,54 +74,76 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 20),
-                const Icon(Icons.agriculture_outlined, size: 60, color: AppTheme.primaryColor),
-                const SizedBox(height: 16),
-                // CHANGE: Personalized welcome message
-                Text(
-                  localizations.welcomeFarmer(widget.farmerName),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  localizations.onboardingFarmDetails,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16, color: AppTheme.subTextColor),
-                ),
-                const SizedBox(height: 32),
-                _buildSectionTitle(localizations.farmDimensions),
-                const SizedBox(height: 16),
-                _buildDimensionFields(localizations),
-                const SizedBox(height: 24),
-                _buildSectionTitle(localizations.plantationDetails),
-                const SizedBox(height: 16),
-                _buildPlantationFields(localizations),
-                const SizedBox(height: 16),
-                _buildCropDropdown(localizations, translatedCrops),
-                const SizedBox(height: 40),
-                ElevatedButton(
-                  onPressed: _createFarmProfile,
-                  child: Text(localizations.createFarmProfile),
-                ),
-              ],
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Icon(
+                    Icons.agriculture_outlined,
+                    size: 60,
+                    color: AppTheme.primaryColor,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    localizations.welcomeFarmer(widget.farmerName),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    localizations.onboardingFarmDetails,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: AppTheme.subTextColor,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  // CHANGE: The form fields are now grouped inside a Card for a consistent UI
+                  Card(
+                    elevation: 2,
+                    shadowColor: AppTheme.primaryColor.withOpacity(0.1),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: const BorderSide(color: AppTheme.borderColor),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _buildDimensionFields(localizations),
+                            const SizedBox(height: 16),
+                            _buildPlantationFields(localizations),
+                            const SizedBox(height: 16),
+                            _buildCropDropdown(localizations, translatedCrops),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  ElevatedButton(
+                    onPressed: _createFarmProfile,
+                    child: Text(localizations.createFarmProfile),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
-  }
-
-  // --- Helper Methods for UI ---
-  Widget _buildSectionTitle(String title) {
-    return Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppTheme.textColor));
   }
 
   Widget _buildDimensionFields(AppLocalizations localizations) {
@@ -143,7 +167,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ],
     );
   }
-  
+
   Widget _buildPlantationFields(AppLocalizations localizations) {
     return Row(
       children: [
@@ -178,15 +202,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         hintText: hintText,
         prefixIcon: Icon(icon, color: AppTheme.subTextColor),
       ),
-      validator: (value) => value!.trim().isEmpty ? 'This field is required' : null,
+      validator: (value) =>
+          value!.trim().isEmpty ? 'This field is required' : null,
     );
   }
 
-  Widget _buildCropDropdown(AppLocalizations localizations, Map<String, String> translatedCrops) {
+  Widget _buildCropDropdown(
+    AppLocalizations localizations,
+    Map<String, String> translatedCrops,
+  ) {
     return DropdownButtonHideUnderline(
       child: DropdownButton2<String>(
         isExpanded: true,
-        hint: Text(localizations.selectCropType, style: TextStyle(fontSize: 14, color: Theme.of(context).hintColor)),
+        hint: Text(
+          localizations.selectCropType,
+          style: TextStyle(fontSize: 14, color: Theme.of(context).hintColor),
+        ),
         items: translatedCrops.entries.map((entry) {
           return DropdownMenuItem<String>(
             value: entry.key,
@@ -202,32 +233,51 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         buttonStyleData: ButtonStyleData(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           height: 55,
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppTheme.borderColor)),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppTheme.borderColor),
+          ),
         ),
-        dropdownStyleData: DropdownStyleData(maxHeight: 200, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12))),
+        dropdownStyleData: DropdownStyleData(
+          maxHeight: 200,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+        ),
         menuItemStyleData: const MenuItemStyleData(height: 40),
         dropdownSearchData: DropdownSearchData(
           searchController: _cropSearchController,
           searchInnerWidgetHeight: 50,
           searchInnerWidget: Container(
             height: 50,
-            padding: const EdgeInsets.only(top: 8, bottom: 4, right: 8, left: 8),
+            padding: const EdgeInsets.only(
+              top: 8,
+              bottom: 4,
+              right: 8,
+              left: 8,
+            ),
             child: TextFormField(
               expands: true,
               maxLines: null,
               controller: _cropSearchController,
               decoration: InputDecoration(
                 isDense: true,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
                 hintText: 'Search for a crop...',
                 hintStyle: const TextStyle(fontSize: 12),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             ),
           ),
           searchMatchFn: (item, searchValue) {
             final textChild = item.child as Text;
-            return textChild.data.toString().toLowerCase().contains(searchValue.toLowerCase());
+            return textChild.data.toString().toLowerCase().contains(
+              searchValue.toLowerCase(),
+            );
           },
         ),
         onMenuStateChange: (isOpen) {

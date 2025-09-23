@@ -29,6 +29,14 @@ class _InfoProfileScreenState extends State<InfoProfileScreen> {
     Language('en', 'English'),
     Language('hi', 'हिन्दी (Hindi)'),
     Language('ta', 'தமிழ் (Tamil)'),
+    Language('pa', 'ਪੰਜਾਬੀ (Punjabi)'),
+    Language('gu', 'ગુજરાતી (Gujarati)'),
+    Language('kn', 'ಕನ್ನಡ (Kannada)'),
+    Language('bn', 'বাংলা (Bengali)'),
+    Language('ml', 'മലയാളം (Malayalam)'),
+    Language('mr', 'मराठी (Marathi)'),
+    Language('or', 'ଓଡ଼ିଆ (Odia)'),
+    Language('te', 'తెలుగు (Telugu)'),
   ];
   Language? _selectedLanguage;
 
@@ -70,39 +78,58 @@ class _InfoProfileScreenState extends State<InfoProfileScreen> {
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Icon(Icons.support_agent, size: 80, color: AppTheme.primaryColor),
-                  const SizedBox(height: 24),
-                  Text(
-                    localizations.welcomeToAgriSense,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // CHANGE: Updated the icon to be more relevant
+                const Icon(Icons.person_search, size: 80, color: AppTheme.primaryColor),
+                const SizedBox(height: 24),
+                Text(
+                  localizations.welcomeToAgriSense,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  localizations.letsGetYouStarted,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16, color: AppTheme.subTextColor),
+                ),
+                const SizedBox(height: 32),
+                
+                // CHANGE: Grouped form fields inside a Card
+                Card(
+                  elevation: 2,
+                  shadowColor: AppTheme.primaryColor.withOpacity(0.1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: const BorderSide(color: AppTheme.borderColor),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    localizations.letsGetYouStarted,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 16, color: AppTheme.subTextColor),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(localizations.yourName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                          const SizedBox(height: 8),
+                          _buildTextFormField(localizations),
+                          const SizedBox(height: 24),
+                          Text(localizations.selectYourLanguage, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                          const SizedBox(height: 8),
+                          _buildLanguageDropdown(),
+                        ],
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 40),
-                  Text(localizations.yourName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 8),
-                  _buildTextFormField(),
-                  const SizedBox(height: 24),
-                  Text(localizations.selectYourLanguage, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 8),
-                  _buildLanguageDropdown(),
-                  const SizedBox(height: 40),
-                  ElevatedButton(
-                    onPressed: _submitProfile,
-                    child: Text(localizations.continueButton),
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: _submitProfile,
+                  child: Text(localizations.continueButton),
+                ),
+              ],
             ),
           ),
         ),
@@ -110,12 +137,12 @@ class _InfoProfileScreenState extends State<InfoProfileScreen> {
     );
   }
 
-  Widget _buildTextFormField() {
+  Widget _buildTextFormField(AppLocalizations localizations) {
     return TextFormField(
       controller: _nameController,
-      decoration: const InputDecoration(
-        hintText: 'Enter your full name',
-        prefixIcon: Icon(Icons.person_outline, color: AppTheme.subTextColor),
+      decoration: InputDecoration(
+        hintText: localizations.yourName,
+        prefixIcon: const Icon(Icons.person_outline, color: AppTheme.subTextColor),
       ),
       validator: (value) => value!.trim().isEmpty ? 'Please enter your name' : null,
     );
@@ -171,4 +198,3 @@ class _InfoProfileScreenState extends State<InfoProfileScreen> {
     );
   }
 }
-
