@@ -1,29 +1,15 @@
 import 'dart:io';
+import 'package:agrisense/models/health_report.dart'; // <-- IMPORT the central model
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 
-// The data model for a single report
-class HealthReport {
-  final String diagnosis;
-  final String severity;
-  final String affectedArea;
-  final String recommendedAction;
-  final String? imagePath;
-
-  HealthReport({
-    required this.diagnosis,
-    required this.severity,
-    required this.affectedArea,
-    required this.recommendedAction,
-    this.imagePath,
-  });
-}
-
 // The UI for displaying the report, now a StatelessWidget
 class HealthReportScreen extends StatelessWidget {
+  // This 'report' variable is now of the correct, centralized type.
   final HealthReport report;
+
   const HealthReportScreen({super.key, required this.report});
 
   @override
@@ -117,4 +103,3 @@ class _DetailText extends StatelessWidget {
     );
   }
 }
-

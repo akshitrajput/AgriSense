@@ -1,43 +1,74 @@
 import 'dart:convert';
 import 'package:agrisense/models/daily_forecast.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:geolocator/geolocator.dart'; // Import the geolocator package
 
 class WeatherService {
-  // --- IMPORTANT: Replace with your actual OpenWeatherMap API Key ---
-  static const String _apiKey = "15db54af5c08b1d7003731cf962d586e";
-  // -----------------------------------------------------------------
+  static const String _apiKey = "23c58c68d34d415983a85602251106";
 
-  static const String _apiUrl =
-      "https://api.openweathermap.org/data/3.0/onecall";
+  /// NEW HELPER FUNCTION: Gets the current position of the user.
+  /// It handles permission requests and location services checks.
+  static Future<Position> _getCurrentPosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    return await Geolocator.getCurrentPosition();
+  }
 
   static Future<List<DailyForecast>> fetchWeatherForecast() async {
-    // TODO: Replace these hardcoded coordinates with the user's actual location
-    // You can get this using a package like 'geolocator'.
-    final double lat = 13.0827; // Chennai Latitude
-    final double lon = 80.2707; // Chennai Longitude
+    // CHANGED: Get location dynamically instead of hardcoding.
+    String location;
+    try {
+      final position = await _getCurrentPosition();
+      location = '${position.latitude},${position.longitude}';
+    } catch (e) {
+      // If getting location fails, you can fall back to a default or rethrow.
+      // Here we rethrow the exception to be handled by the UI.
+      throw Exception('Failed to get user location: $e');
+    }
 
+    // This URL correctly requests a 7-day forecast.
     final url =
-        '$_apiUrl?lat=$lat&lon=$lon&exclude=current,minutely,hourly,alerts&appid=$_apiKey&units=metric';
+        'https://api.weatherapi.com/v1/forecast.json?key=$_apiKey&q=$location&days=7&aqi=no&alerts=no';
 
     try {
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        final List<dynamic> dailyData = jsonData['daily'];
+        final List<dynamic> dailyData = jsonData['forecast']['forecastday'];
 
-        // Take the next 8 days (today + 7) and map to our model
-        return dailyData
-            .take(8)
-            .map((item) => DailyForecast.fromJson(item))
-            .toList();
+        return dailyData.map((item) => DailyForecast.fromJson(item)).toList();
       } else {
         throw Exception(
-          'Failed to load weather data. Status code: ${response.statusCode}',
+          'Failed to load weather data. Status Code: ${response.statusCode}. Body: ${response.body}',
         );
       }
     } catch (e) {
-      print('Error fetching weather: $e');
+      debugPrint('Error fetching weather: $e');
       throw Exception('Failed to connect to the weather service.');
     }
   }

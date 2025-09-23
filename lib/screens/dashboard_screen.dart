@@ -1,5 +1,6 @@
 import 'package:agrisense/models/daily_forecast.dart';
 import 'package:agrisense/models/farm_data.dart';
+import 'package:agrisense/models/health_report.dart';
 import 'package:agrisense/providers/farm_data_provider.dart';
 import 'package:agrisense/screens/farm_map_screen.dart';
 import 'package:agrisense/screens/health_report_screen.dart';
@@ -33,10 +34,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final farmDataProvider = context.watch<FarmDataProvider>();
-    final farmData = farmDataProvider.farmData!; // We can now safely use `!` because SplashScreen guarantees data exists.
-
-    // REMOVED: The `if (farmData == null)` block is gone.
+    final farmData = context.watch<FarmDataProvider>().farmData!;
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -44,8 +42,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              // Use push instead of pushAndRemoveUntil to allow returning to the dashboard
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
             },
             icon: const Icon(Icons.settings_outlined, size: 28.0),
           ),
@@ -69,7 +69,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // --- All other helper methods (_buildWeatherForecastCard, etc.) remain unchanged ---
+  // --- UI IMPROVEMENT 1: The main card now distributes its children evenly. ---
   Widget _buildWeatherForecastCard() {
     return Card(
       elevation: 2,
@@ -78,25 +78,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("7-Day Forecast", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
+            const Text(
+              "3-Day Forecast",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
             FutureBuilder<List<DailyForecast>>(
               future: _forecastFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(heightFactor: 3, child: CircularProgressIndicator(color: AppTheme.primaryColor));
+                  return const Center(
+                    heightFactor: 3,
+                    child: CircularProgressIndicator(
+                      color: AppTheme.primaryColor,
+                    ),
+                  );
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: AppTheme.affectedColor)));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No forecast data available.'));
+                  return Center(
+                    child: Text(
+                      'Error: ${snapshot.error}',
+                      style: const TextStyle(color: AppTheme.affectedColor),
+                    ),
+                  );
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  final forecasts = snapshot.data!;
+                  // Use a Row with spaceAround alignment to distribute the 3 items.
+                  // No scrolling is needed.
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: forecasts
+                        .map((forecast) => _buildDailyForecastItem(forecast))
+                        .toList(),
+                  );
+                } else {
+                  return const Center(
+                    child: Text('No forecast data available.'),
+                  );
                 }
-                final forecasts = snapshot.data!;
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: forecasts.map((forecast) => _buildDailyForecastItem(forecast)).toList(),
-                  ),
-                );
               },
             ),
           ],
@@ -105,35 +123,77 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  // --- UI IMPROVEMENT 2: Each forecast item is now a more detailed card. ---
   Widget _buildDailyForecastItem(DailyForecast forecast) {
-    return Container(
-      width: 80,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-      margin: const EdgeInsets.only(right: 8),
-      decoration: BoxDecoration(
-        color: AppTheme.backgroundColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(DateFormat('EEE').format(forecast.dateTime), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 8),
-          Image.network('https://openweathermap.org/img/wn/${forecast.weatherIconCode}@2x.png', width: 40, height: 40),
-          const SizedBox(height: 8),
-          Text('${forecast.temp.round()}°C', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-        ],
+    final String iconUrl = 'https:${forecast.weatherIconCode}';
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.symmetric(
+          horizontal: 4.0,
+        ), // Add spacing between cards
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        decoration: BoxDecoration(
+          color: AppTheme.backgroundColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              DateFormat('EEE').format(forecast.dateTime), // e.g., "Mon"
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Image.network(
+              iconUrl,
+              width: 50, // Larger icon
+              height: 50,
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.cloud_off,
+                color: AppTheme.subTextColor,
+                size: 40,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${forecast.temp.round()}°C',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ), // Larger temperature
+            ),
+            const SizedBox(height: 4),
+            Text(
+              forecast.weatherDescription,
+              textAlign: TextAlign.center,
+              maxLines: 2, // Allow wrapping for longer descriptions
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppTheme.subTextColor,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildFarmSummaryCard(AppLocalizations localizations, FarmData farmData) {
+  // --- All other widgets below remain unchanged ---
+
+  Widget _buildFarmSummaryCard(
+    AppLocalizations localizations,
+    FarmData farmData,
+  ) {
     String cropDisplay = 'N/A';
     final String? cropKey = farmData.cropTypeKey;
     if (cropKey != null) {
       final Map<String, String> translatedCrops = {
-        'wheat': localizations.cropWheat, 'maize': localizations.cropMaize, 'corn': localizations.cropCorn,
-        'tomato': localizations.cropTomato, 'potato': localizations.cropPotato,
+        'wheat': localizations.cropWheat,
+        'maize': localizations.cropMaize,
+        'corn': localizations.cropCorn,
+        'tomato': localizations.cropTomato,
+        'potato': localizations.cropPotato,
       };
       cropDisplay = translatedCrops[cropKey] ?? 'N/A';
     }
@@ -144,13 +204,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(localizations.farmSummary, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              localizations.farmSummary,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 16),
-            _buildSummaryRow(Icons.eco_outlined, localizations.crop, cropDisplay),
+            _buildSummaryRow(
+              Icons.eco_outlined,
+              localizations.crop,
+              cropDisplay,
+            ),
             const SizedBox(height: 12),
-            _buildSummaryRow(Icons.aspect_ratio_outlined, localizations.area, '${farmData.farmLength ?? 0}m × ${farmData.farmBreadth ?? 0}m'),
+            _buildSummaryRow(
+              Icons.aspect_ratio_outlined,
+              localizations.area,
+              '${farmData.farmLength ?? 0}m × ${farmData.farmBreadth ?? 0}m',
+            ),
             const SizedBox(height: 12),
-            _buildSummaryRow(Icons.format_list_numbered, localizations.rows, '${farmData.rows ?? 0}'),
+            _buildSummaryRow(
+              Icons.format_list_numbered,
+              localizations.rows,
+              '${farmData.rows ?? 0}',
+            ),
           ],
         ),
       ),
@@ -158,13 +233,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildSummaryRow(IconData icon, String title, String value) {
-    return Row(children: [
-      Icon(icon, color: AppTheme.primaryColor, size: 20),
-      const SizedBox(width: 12),
-      Text(title, style: const TextStyle(fontSize: 16, color: AppTheme.subTextColor)),
-      const SizedBox(width: 8),
-      Expanded(child: Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600), textAlign: TextAlign.end)),
-    ]);
+    return Row(
+      children: [
+        Icon(icon, color: AppTheme.primaryColor, size: 20),
+        const SizedBox(width: 12),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 16, color: AppTheme.subTextColor),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            textAlign: TextAlign.end,
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildSmartControlsCard(AppLocalizations localizations) {
@@ -175,73 +261,136 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(localizations.smartControls, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              localizations.smartControls,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 16),
-            _buildControlRow(icon: Icons.precision_manufacturing_outlined, label: localizations.autonomousRover, isActive: isRoverActive, onToggle: () => setState(() => isRoverActive = !isRoverActive), localizations: localizations),
+            _buildControlRow(
+              icon: Icons.precision_manufacturing_outlined,
+              label: localizations.autonomousRover,
+              isActive: isRoverActive,
+              onToggle: () => setState(() => isRoverActive = !isRoverActive),
+              localizations: localizations,
+            ),
             const Divider(height: 24),
-            _buildControlRow(icon: Icons.water_drop_outlined, label: localizations.sprinklerSystem, isActive: isSprinklerActive, onToggle: () => setState(() => isSprinklerActive = !isSprinklerActive), localizations: localizations),
+            _buildControlRow(
+              icon: Icons.water_drop_outlined,
+              label: localizations.sprinklerSystem,
+              isActive: isSprinklerActive,
+              onToggle: () =>
+                  setState(() => isSprinklerActive = !isSprinklerActive),
+              localizations: localizations,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildControlRow({required IconData icon, required String label, required bool isActive, required VoidCallback onToggle, required AppLocalizations localizations}) {
-    return Row(children: [
-      Icon(icon, color: AppTheme.primaryColor, size: 28),
-      const SizedBox(width: 16),
-      Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-      const Spacer(),
-      GestureDetector(
-        onTap: onToggle,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(color: isActive ? AppTheme.primaryColor : AppTheme.affectedColor, borderRadius: BorderRadius.circular(20)),
-          child: Text(isActive ? localizations.on : localizations.off, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+  Widget _buildControlRow({
+    required IconData icon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onToggle,
+    required AppLocalizations localizations,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, color: AppTheme.primaryColor, size: 28),
+        const SizedBox(width: 16),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
-      ),
-    ]);
+        const Spacer(),
+        GestureDetector(
+          onTap: onToggle,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: isActive ? AppTheme.primaryColor : AppTheme.affectedColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              isActive ? localizations.on : localizations.off,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
-  Widget _buildNavigationButtons(AppLocalizations localizations, FarmData farmData) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Text(localizations.toolsAndAnalytics, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textColor)),
-      const SizedBox(height: 16),
-      OutlinedButton.icon(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => FarmMapScreen(
-            farmLength: farmData.farmLength ?? 0.0,
-            farmWidth: farmData.farmBreadth ?? 0.0,
-            rows: farmData.rows ?? 0,
-            plantsPerRow: farmData.plantsPerRow ?? 0,
-          )));
-        },
-        icon: const Icon(Icons.map_outlined),
-        label: Text(localizations.viewFarmMap),
-      ),
-      const SizedBox(height: 12),
-      OutlinedButton.icon(
-        onPressed: () {
-          final placeholderReport = HealthReport(
+  Widget _buildNavigationButtons(
+    AppLocalizations localizations,
+    FarmData farmData,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          localizations.toolsAndAnalytics,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.textColor,
+          ),
+        ),
+        const SizedBox(height: 16),
+        OutlinedButton.icon(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FarmMapScreen(
+                  farmLength: farmData.farmLength ?? 0.0,
+                  farmWidth: farmData.farmBreadth ?? 0.0,
+                  rows: farmData.rows ?? 0,
+                  plantsPerRow: farmData.plantsPerRow ?? 0,
+                ),
+              ),
+            );
+          },
+          icon: const Icon(Icons.map_outlined),
+          label: Text(localizations.viewFarmMap),
+        ),
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          onPressed: () {
+            final placeholderReport = HealthReport(
               diagnosis: "Fungal Leaf Blight",
               severity: "High",
               affectedArea: "35%",
-              recommendedAction: "Apply fungicide and monitor."
-          );
-          Navigator.push(context, MaterialPageRoute(builder: (context) => HealthReportScreen(report: placeholderReport)));
-        },
-        icon: const Icon(Icons.article_outlined),
-        label: Text(localizations.viewPreviousReports),
-      ),
-      const SizedBox(height: 12),
-      ElevatedButton.icon(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const PlantScanScreen()));
-        },
-        icon: const Icon(Icons.camera_alt_outlined),
-        label: Text(localizations.scanNewPlant),
-      ),
-    ]);
+              recommendedAction: "Apply fungicide and monitor.",
+            );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    HealthReportScreen(report: placeholderReport),
+              ),
+            );
+          },
+          icon: const Icon(Icons.article_outlined),
+          label: Text(localizations.viewPreviousReports),
+        ),
+        const SizedBox(height: 12),
+        ElevatedButton.icon(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const PlantScanScreen()),
+            );
+          },
+          icon: const Icon(Icons.camera_alt_outlined),
+          label: Text(localizations.scanNewPlant),
+        ),
+      ],
+    );
   }
 }

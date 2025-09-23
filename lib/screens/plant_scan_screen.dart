@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math'; // For generating random data
+import 'package:agrisense/models/health_report.dart'; // <-- IMPORT the central model
 import 'package:agrisense/screens/health_report_screen.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,7 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
       final imageFile = File(pickedFile.path);
 
       // 1. Simulate the analysis of the picked image
+      // This now creates an instance of the correct HealthReport model.
       final HealthReport report = await _analyzeImage(imageFile);
 
       // 2. After analysis, navigate to the report screen with the results
@@ -56,7 +58,7 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
     );
   }
 
-  /// Navigation logic now passes the dynamic report data.
+  /// Navigation logic now passes the correct HealthReport object.
   void _navigateToReport(HealthReport report) {
     Navigator.push(
       context,
@@ -140,4 +142,3 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
     );
   }
 }
-

@@ -13,15 +13,23 @@ class DailyForecast {
     required this.weatherIconCode,
   });
 
-  // A factory constructor to create a DailyForecast from JSON
+  // Updated factory constructor for weatherapi.com
   factory DailyForecast.fromJson(Map<String, dynamic> json) {
+    // The main data is now nested inside a 'day' object
+    final dayData = json['day'] as Map<String, dynamic>;
+    final conditionData = dayData['condition'] as Map<String, dynamic>;
+
     return DailyForecast(
-      dateTime: DateTime.fromMillisecondsSinceEpoch((json['dt'] as int) * 1000),
-      temp: (json['temp']['day'] as num).toDouble(),
-      humidity: json['humidity'] as int,
-      weatherDescription: json['weather'][0]['description'] as String,
-      weatherIconCode: json['weather'][0]['icon'] as String,
+      // 'date_epoch' provides the timestamp
+      dateTime: DateTime.fromMillisecondsSinceEpoch((json['date_epoch'] as int) * 1000),
+      // 'avgtemp_c' is the average temperature
+      temp: (dayData['avgtemp_c'] as num).toDouble(),
+      // 'avghumidity' is the average humidity
+      humidity: (dayData['avghumidity'] as num).toInt(),
+      // 'text' inside 'condition' is the description
+      weatherDescription: conditionData['text'] as String,
+      // 'icon' inside 'condition' is the icon path
+      weatherIconCode: conditionData['icon'] as String,
     );
   }
 }
-
