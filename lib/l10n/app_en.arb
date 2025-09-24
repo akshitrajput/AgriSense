@@ -87,5 +87,9 @@
     "aug": "Aug",
     "sep": "Sep",
     "email": "Email ID",
-    "password": "Password"
+    "password": "Password",
+    "cropDetailsTitle": "Crop Details",
+    "markAffected": "Mark as Affected",
+    "markHealthy": "Mark as Healthy",
+    "close": "Close"
 }
