@@ -39,7 +39,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     return Scaffold(
-      // Use a background color for the whole screen
       backgroundColor: AppTheme.backgroundColor,
       appBar: CustomAppBar(
         title: '${localizations.welcomeMessage} ${farmData.name}',
@@ -73,7 +72,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildWeatherForecastCard() {
     return Card(
-      elevation: 4, // Increased elevation for a lifting effect
+      elevation: 4,
       shadowColor: AppTheme.primaryColor.withOpacity(0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
@@ -82,7 +81,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "7-Day Forecast",
+              "Weather Forecast",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -91,7 +90,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const SizedBox(
-                    height: 120, // Give it a fixed height while loading
+                    height: 120,
                     child: Center(
                       child:
                       CircularProgressIndicator(color: AppTheme.primaryColor),
@@ -116,7 +115,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   );
                 }
                 final forecasts = snapshot.data!;
-                // **UI FIX:** Center the scrolling list vertically and horizontally
                 return SizedBox(
                   height: 120,
                   child: Center(
@@ -141,8 +139,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildDailyForecastItem(DailyForecast forecast) {
     final String iconUrl = 'https:${forecast.weatherIconCode}';
-
-    // **UI ENHANCEMENT:** Added more visual flair to each item
     return Container(
       width: 85,
       margin: const EdgeInsets.symmetric(horizontal: 6.0),
@@ -298,7 +294,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       case 5: text = const Text('Sep', style: style); break;
       default: text = const Text('', style: style); break;
     }
-    return SideTitleWidget(axisSide: meta.axisSide, child: text);
+    // FIX: Return the Text widget directly
+    return text;
   }
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
@@ -328,7 +325,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
         ),
-        // **UI ENHANCEMENT:** Using a Card for better grouping of actions
         Card(
           elevation: 4,
           shadowColor: AppTheme.primaryColor.withOpacity(0.2),
@@ -370,7 +366,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        // **UI ENHANCEMENT:** Primary action button is more prominent
         ElevatedButton.icon(
           onPressed: () {
             Navigator.push(
@@ -391,7 +386,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // Helper widget to create consistent rows for action buttons
   Widget _buildActionButtonRow({required IconData icon, required String label, required VoidCallback onPressed}) {
     return InkWell(
       onTap: onPressed,
@@ -415,4 +409,3 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 }
-

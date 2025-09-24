@@ -25,18 +25,21 @@ class _InfoProfileScreenState extends State<InfoProfileScreen> {
   final _nameController = TextEditingController();
   final _languageSearchController = TextEditingController();
 
+  // CHANGE: Updated the list to include all languages
   final List<Language> _languages = [
     Language('en', 'English'),
     Language('hi', 'हिन्दी (Hindi)'),
     Language('ta', 'தமிழ் (Tamil)'),
-    Language('pa', 'ਪੰਜਾਬੀ (Punjabi)'),
+    Language('bn', 'বাংলা (Bengali)'),
+    Language('te', 'తెలుగు (Telugu)'),
+    Language('mr', 'मराठी (Marathi)'),
+    Language('ur', 'اردو (Urdu)'),
     Language('gu', 'ગુજરાતી (Gujarati)'),
     Language('kn', 'ಕನ್ನಡ (Kannada)'),
-    Language('bn', 'বাংলা (Bengali)'),
-    Language('ml', 'മലയാളം (Malayalam)'),
-    Language('mr', 'मराठी (Marathi)'),
     Language('or', 'ଓଡ଼ିଆ (Odia)'),
-    Language('te', 'తెలుగు (Telugu)'),
+    Language('ml', 'മലയാളം (Malayalam)'),
+    Language('pa', 'ਪੰਜਾਬੀ (Punjabi)'),
+    Language('as', 'অসমীয়া (Assamese)'),
   ];
   Language? _selectedLanguage;
 
@@ -78,58 +81,58 @@ class _InfoProfileScreenState extends State<InfoProfileScreen> {
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // CHANGE: Updated the icon to be more relevant
-                const Icon(Icons.person_search, size: 80, color: AppTheme.primaryColor),
-                const SizedBox(height: 24),
-                Text(
-                  localizations.welcomeToAgriSense,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  localizations.letsGetYouStarted,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16, color: AppTheme.subTextColor),
-                ),
-                const SizedBox(height: 32),
-                
-                // CHANGE: Grouped form fields inside a Card
-                Card(
-                  elevation: 2,
-                  shadowColor: AppTheme.primaryColor.withOpacity(0.1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: AppTheme.borderColor),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.waving_hand_outlined, size: 60, color: AppTheme.primaryColor),
+                  const SizedBox(height: 24),
+                  Text(
+                    localizations.welcomeToAgriSense,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(localizations.yourName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                          const SizedBox(height: 8),
-                          _buildTextFormField(localizations),
-                          const SizedBox(height: 24),
-                          Text(localizations.selectYourLanguage, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                          const SizedBox(height: 8),
-                          _buildLanguageDropdown(),
-                        ],
+                  const SizedBox(height: 8),
+                  Text(
+                    localizations.letsGetYouStarted,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 16, color: AppTheme.subTextColor),
+                  ),
+                  const SizedBox(height: 32),
+                  Card(
+                    elevation: 2,
+                    shadowColor: AppTheme.primaryColor.withOpacity(0.1),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: const BorderSide(color: AppTheme.borderColor),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(localizations.yourName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                            const SizedBox(height: 8),
+                            _buildTextFormField(localizations),
+                            const SizedBox(height: 24),
+                            Text(localizations.selectYourLanguage, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                            const SizedBox(height: 8),
+                            _buildLanguageDropdown(),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 32),
-                ElevatedButton(
-                  onPressed: _submitProfile,
-                  child: Text(localizations.continueButton),
-                ),
-              ],
+                  const SizedBox(height: 32),
+                  ElevatedButton(
+                    onPressed: _submitProfile,
+                    child: Text(localizations.continueButton),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

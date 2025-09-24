@@ -1,6 +1,5 @@
 {
     "@@locale": "hi",
-
     "welcomeMessage": "स्वागत है,",
     "yourName": "आपका नाम",
     "close": "बंद करें",
@@ -11,15 +10,10 @@
     "welcomeToAgriSense": "एग्रीसेंस में आपका स्वागत है!",
     "letsGetYouStarted": "चलिए कुछ विवरणों के साथ शुरू करते हैं।",
     "selectYourLanguage": "अपनी भाषा चुनें",
-
     "welcomeFarmer": "स्वागत है, {farmerName}!",
-    "@welcomeFarmer": {
-        "placeholders": {
-            "farmerName": {
-                "type": "String"
-            }
-        }
-    },
+    "@welcomeFarmer": { "placeholders": { "farmerName": { "type": "String" } } },
+    "onboardingTitle": "अपनी प्रोफ़ाइल विकसित करें",
+    "onboardingSubtitle": "चलिए आपकी फसल शुरू करते हैं।",
     "onboardingFarmDetails": "अपनी प्रोफ़ाइल पूरी करने के लिए कृपया अपने खेत का विवरण प्रदान करें।",
     "farmDimensions": "खेत के आयाम",
     "farmLocation": "खेत का स्थान",
@@ -30,8 +24,7 @@
     "breadth": "चौड़ाई (मीटर)",
     "numberOfRows": "पंक्तियों की संख्या",
     "plantsPerRow": "प्रति पंक्ति पौधे",
-    "createFarmProfile": "फार्म प्रोफ़ाइल बनाएं",
-
+    "createFarmProfile": "फार्म प्रोफाइल बनाएं",
     "farmSummary": "खेत का सारांश",
     "crop": "फ़सल:",
     "area": "क्षेत्र:",
@@ -43,7 +36,6 @@
     "viewFarmMap": "खेत का नक्शा देखें",
     "viewPreviousReports": "पिछली रिपोर्ट देखें",
     "scanNewPlant": "एक नया पौधा स्कैन करें",
-
     "marketAndWeather": "बाजार और मौसम",
     "chennaiWeather": "चेन्नई का मौसम",
     "humidity": "नमी",
@@ -53,11 +45,9 @@
     "tip1": "नए जैविक कीटनाशक के शुरुआती परीक्षणों में अच्छे परिणाम दिख रहे हैं।",
     "tip2": "उचित मिट्टी वातन से फसल की उपज 15% तक बढ़ सकती है।",
     "tip3": "सूखे मौसम में पानी बचाने के लिए ड्रिप सिंचाई पर विचार करें।",
-
     "plantHealthScan": "पौधों का स्वास्थ्य स्कैन",
     "scanWithCamera": "कैमरे से स्कैन करें",
     "uploadFromStorage": "स्टोरेज से अपलोड करें",
-
     "plantHealthReport": "पौधों का स्वास्थ्य रिपोर्ट",
     "diseaseDetected": "रोग का पता चला",
     "severityHigh": "गंभीरता: उच्च",
@@ -67,14 +57,12 @@
     "affectedArea": "प्रभावित क्षेत्र",
     "recommendedAction": "अनुशंसित कार्रवाई",
     "applyFungicide": "कवकनाशी लगाएं, पौधे को अलग करें",
-
     "farmMapView": "खेत का नक्शा देखें",
     "healthyPlants": "स्वस्थ पौधे",
     "affectedPlants": "प्रभावित पौधे",
     "cropDetailsTitle": "फ़सल का विवरण",
     "markAffected": "प्रभावित के रूप में चिह्नित करें",
     "markHealthy": "स्वस्थ के रूप में चिह्नित करें",
-
     "settings": "सेटिंग्स",
     "farmDetails": "खेत का विवरण",
     "language": "भाषा",
@@ -82,7 +70,6 @@
     "logOut": "लॉग आउट",
     "selectLanguage": "भाषा चुनें",
     "detailsUpdatedMessage": "विवरण सफलतापूर्वक अपडेट किया गया!",
-
     "selectCropType": "फ़सल का प्रकार चुनें",
     "cropWheat": "गेहूँ",
     "cropMaize": "मक्का",
@@ -91,7 +78,12 @@
     "cropPotato": "आलू",
     "scanHistory": "स्कैन इतिहास",
     "noHistoryRecords": "कोई इतिहास रिकॉर्ड नहीं मिला।",
-    "onboardingTitle": "अपनी प्रोफ़ाइल विकसित करें",
-    "onboardingSubtitle": "चलिए आपकी फसल शुरू करते हैं।"
+    "sevenDayForecast": "७-दिन का पूर्वानुमान",
+    "cropHealthStatus": "फसल स्वास्थ्य स्थिति",
+    "apr": "अप्रै",
+    "may": "मई",
+    "jun": "जून",
+    "jul": "जुलाई",
+    "aug": "अगस्त",
+    "sep": "सितं"
 }
-

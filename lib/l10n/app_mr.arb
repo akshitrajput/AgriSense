@@ -50,7 +50,7 @@
     "uploadFromStorage": "स्टोरेजमधून अपलोड करा",
     "plantHealthReport": "वनस्पती आरोग्य अहवाल",
     "diseaseDetected": "रोग आढळला",
-    "severityHigh": "తీవ్రता: उच्च",
+    "severityHigh": "तीव्रता: उच्च",
     "analysisDetails": "विश्लेषण तपशील",
     "diagnosis": "रोगनिदान",
     "fungalLeafBlight": "फंगल लीफ ब्लाइट",
@@ -77,5 +77,13 @@
     "cropTomato": "टोमॅटो",
     "cropPotato": "बटाटा",
     "scanHistory": "स्कॅन इतिहास",
-    "noHistoryRecords": "कोणतेही इतिहास रेकॉर्ड आढळले नाहीत."
-}
+    "noHistoryRecords": "कोणतेही इतिहास रेकॉर्ड आढळले नाहीत.",
+    "sevenDayForecast": "७-दिवसांचा अंदाज",
+    "cropHealthStatus": "पीक आरोग्य स्थिती",
+    "apr": "एप्रिल",
+    "may": "मे",
+    "jun": "जून",
+    "jul": "जुलै",
+    "aug": "ऑगस्ट",
+    "sep": "सप्टेंबर"
+}   

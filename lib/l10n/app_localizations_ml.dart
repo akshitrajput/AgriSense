@@ -44,6 +44,12 @@ class AppLocalizationsMl extends AppLocalizations {
   }
 
   @override
+  String get onboardingTitle => 'നിങ്ങളുടെ പ്രൊഫൈൽ തയ്യാറാക്കുന്നു';
+
+  @override
+  String get onboardingSubtitle => 'നമുക്ക് വിളവെടുപ്പ് ആരംഭിക്കാം.';
+
+  @override
   String get onboardingFarmDetails =>
       'നിങ്ങളുടെ പ്രൊഫൈൽ പൂർത്തിയാക്കാൻ ദയവായി ഫാം വിവരങ്ങൾ നൽകുക.';
 
@@ -239,8 +245,26 @@ class AppLocalizationsMl extends AppLocalizations {
   String get noHistoryRecords => 'ചരിത്ര രേഖകൾ ഒന്നും കണ്ടെത്തിയില്ല.';
 
   @override
-  String get onboardingTitle => 'നിങ്ങളുടെ പ്രൊഫൈൽ തയ്യാറാക്കുന്നു';
+  String get sevenDayForecast => '7 ദിവസത്തെ പ്രവചനം';
 
   @override
-  String get onboardingSubtitle => 'നമുക്ക് വിളവെടുപ്പ് ആരംഭിക്കാം.';
+  String get cropHealthStatus => 'വിളയുടെ ആരോഗ്യ നില';
+
+  @override
+  String get apr => 'ഏപ്രിൽ';
+
+  @override
+  String get may => 'മെയ്';
+
+  @override
+  String get jun => 'ജൂൺ';
+
+  @override
+  String get jul => 'ജൂലൈ';
+
+  @override
+  String get aug => 'ഓഗസ്റ്റ്';
+
+  @override
+  String get sep => 'സെപ്റ്റംബർ';
 }

@@ -45,21 +45,23 @@ class AgriSenseApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           debugShowCheckedModeBanner: false,
           locale: languageProvider.appLocale,
-          // CHANGE: Added all 14 supported languages
+          
+          // These two properties make the translations available to your whole app.
+          // They must be set correctly.
           supportedLocales: const [
-            Locale('en', ''), // English
-            Locale('hi', ''), // Hindi
-            Locale('ta', ''), // Tamil
-            Locale('bn', ''), // Bengali
-            Locale('te', ''), // Telugu
-            Locale('mr', ''), // Marathi
-            Locale('ur', ''), // Urdu
-            Locale('gu', ''), // Gujarati
-            Locale('kn', ''), // Kannada
-            Locale('or', ''), // Odia
-            Locale('ml', ''), // Malayalam
-            Locale('pa', ''), // Punjabi
-            Locale('as', ''), // Assamese
+            Locale('en', ''),
+            Locale('hi', ''),
+            Locale('ta', ''),
+            Locale('bn', ''),
+            Locale('te', ''),
+            Locale('mr', ''),
+            Locale('ur', ''),
+            Locale('gu', ''),
+            Locale('kn', ''),
+            Locale('or', ''),
+            Locale('ml', ''),
+            Locale('pa', ''),
+            Locale('as', ''),
           ],
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -67,6 +69,7 @@ class AgriSenseApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
+          
           home: const SplashScreen(),
         );
       },

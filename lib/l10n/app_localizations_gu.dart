@@ -44,6 +44,12 @@ class AppLocalizationsGu extends AppLocalizations {
   }
 
   @override
+  String get onboardingTitle => 'તમારી પ્રોફાઇલની ખેતી';
+
+  @override
+  String get onboardingSubtitle => 'ચાલો તમારી લણણી શરૂ કરીએ.';
+
+  @override
   String get onboardingFarmDetails =>
       'તમારી પ્રોફાઇલ પૂર્ણ કરવા માટે કૃપા કરીને તમારા ફાર્મની વિગતો આપો.';
 
@@ -238,8 +244,26 @@ class AppLocalizationsGu extends AppLocalizations {
   String get noHistoryRecords => 'કોઈ ઇતિહાસ રેકોર્ડ મળ્યો નથી.';
 
   @override
-  String get onboardingTitle => 'તમારી પ્રોફાઇલની ખેતી';
+  String get sevenDayForecast => '૭-દિવસનું પૂર્વાનુમાન';
 
   @override
-  String get onboardingSubtitle => 'ચાલો તમારી લણણી શરૂ કરીએ.';
+  String get cropHealthStatus => 'પાક આરોગ્ય સ્થિતિ';
+
+  @override
+  String get apr => 'એપ્રિલ';
+
+  @override
+  String get may => 'મે';
+
+  @override
+  String get jun => 'જૂન';
+
+  @override
+  String get jul => 'જુલાઈ';
+
+  @override
+  String get aug => 'ઓગસ્ટ';
+
+  @override
+  String get sep => 'સપ્ટેમ્બર';
 }

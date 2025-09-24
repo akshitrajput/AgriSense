@@ -44,6 +44,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get onboardingTitle => 'Cultivating Your Profile';
+
+  @override
+  String get onboardingSubtitle => 'Let\'s begin your harvest.';
+
+  @override
   String get onboardingFarmDetails =>
       'Please provide your farm\'s details to complete your profile.';
 
@@ -240,8 +246,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noHistoryRecords => 'No history records found.';
 
   @override
-  String get onboardingTitle => 'Cultivating Your Profile';
+  String get sevenDayForecast => '7-Day Forecast';
 
   @override
-  String get onboardingSubtitle => 'Let\'s begin your harvest.';
+  String get cropHealthStatus => 'Crop Health Status';
+
+  @override
+  String get apr => 'Apr';
+
+  @override
+  String get may => 'May';
+
+  @override
+  String get jun => 'Jun';
+
+  @override
+  String get jul => 'Jul';
+
+  @override
+  String get aug => 'Aug';
+
+  @override
+  String get sep => 'Sep';
 }

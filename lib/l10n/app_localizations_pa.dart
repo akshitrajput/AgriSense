@@ -44,6 +44,12 @@ class AppLocalizationsPa extends AppLocalizations {
   }
 
   @override
+  String get onboardingTitle => 'ਆਪਣੀ ਪ੍ਰੋਫਾਈਲ ਨੂੰ ਵਧਾਓ';
+
+  @override
+  String get onboardingSubtitle => 'ਆਓ ਆਪਣੀ ਵਾਢੀ ਸ਼ੁਰੂ ਕਰੀਏ।';
+
+  @override
   String get onboardingFarmDetails =>
       'ਆਪਣੀ ਪ੍ਰੋਫਾਈਲ ਨੂੰ ਪੂਰਾ ਕਰਨ ਲਈ ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੇ ਖੇਤ ਦੇ ਵੇਰਵੇ ਦਿਓ।';
 
@@ -240,8 +246,26 @@ class AppLocalizationsPa extends AppLocalizations {
   String get noHistoryRecords => 'ਕੋਈ ਇਤਿਹਾਸ ਰਿਕਾਰਡ ਨਹੀਂ ਮਿਲਿਆ।';
 
   @override
-  String get onboardingTitle => 'ਆਪਣੀ ਪ੍ਰੋਫਾਈਲ ਨੂੰ ਵਧਾਓ';
+  String get sevenDayForecast => '੭-ਦਿਨ ਦੀ ਭਵਿੱਖਬਾਣੀ';
 
   @override
-  String get onboardingSubtitle => 'ਆਓ ਆਪਣੀ ਵਾਢੀ ਸ਼ੁਰੂ ਕਰੀਏ।';
+  String get cropHealthStatus => 'ਫਸਲ ਦੀ ਸਿਹਤ ਸਥਿਤੀ';
+
+  @override
+  String get apr => 'ਅਪ੍ਰੈਲ';
+
+  @override
+  String get may => 'ਮਈ';
+
+  @override
+  String get jun => 'ਜੂਨ';
+
+  @override
+  String get jul => 'ਜੁਲਾਈ';
+
+  @override
+  String get aug => 'ਅਗਸਤ';
+
+  @override
+  String get sep => 'ਸਤੰਬਰ';
 }

@@ -77,5 +77,13 @@
     "cropTomato": "ಟೊಮೇಟೊ",
     "cropPotato": "ಆಲೂಗಡ್ಡೆ",
     "scanHistory": "ಸ್ಕ್ಯಾನ್ ಇತಿಹಾಸ",
-    "noHistoryRecords": "ಯಾವುದೇ ಇತಿಹಾಸದ ದಾಖಲೆಗಳು ಕಂಡುಬಂದಿಲ್ಲ."
+    "noHistoryRecords": "ಯಾವುದೇ ಇತಿಹಾಸದ ದಾಖಲೆಗಳು ಕಂಡುಬಂದಿಲ್ಲ.",
+    "sevenDayForecast": "7-ದಿನದ ಮುನ್ಸೂಚನೆ",
+    "cropHealthStatus": "ಬೆಳೆ ಆರೋಗ್ಯ ಸ್ಥಿತಿ",
+    "apr": "ಏಪ್ರಿಲ್",
+    "may": "ಮೇ",
+    "jun": "ಜೂನ್",
+    "jul": "ಜುಲೈ",
+    "aug": "ಆಗಸ್ಟ್",
+    "sep": "ಸೆಪ್ಟೆಂಬರ್"
 }

@@ -77,5 +77,13 @@
     "cropTomato": "టమోటా",
     "cropPotato": "బంగాళాదుంప",
     "scanHistory": "స్కాన్ చరిత్ర",
-    "noHistoryRecords": "చరిత్ర రికార్డులు ఏవీ కనుగొనబడలేదు."
+    "noHistoryRecords": "చరిత్ర రికార్డులు ఏవీ కనుగొనబడలేదు.",
+    "sevenDayForecast": "7-రోజుల సూచన",
+    "cropHealthStatus": "పంట ఆరోగ్య స్థితి",
+    "apr": "ఏప్రిల్",
+    "may": "మే",
+    "jun": "జూన్",
+    "jul": "జూలై",
+    "aug": "ఆగస్టు",
+    "sep": "సెప్టెంబర్"
 }

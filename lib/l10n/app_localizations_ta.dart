@@ -36,12 +36,18 @@ class AppLocalizationsTa extends AppLocalizations {
   String get letsGetYouStarted => 'சில விவரங்களுடன் தொடங்குவோம்.';
 
   @override
-  String get selectYourLanguage => 'உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்';
+  String get selectYourLanguage => 'உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்';
 
   @override
   String welcomeFarmer(String farmerName) {
     return 'வரவேற்பு, $farmerName!';
   }
+
+  @override
+  String get onboardingTitle => 'உங்கள் சுயவிவரத்தை வளர்க்கவும்';
+
+  @override
+  String get onboardingSubtitle => 'உங்கள் அறுவடையைத் தொடங்குவோம்.';
 
   @override
   String get onboardingFarmDetails =>
@@ -242,8 +248,26 @@ class AppLocalizationsTa extends AppLocalizations {
   String get noHistoryRecords => 'வரலாற்றுப் பதிவுகள் எதுவும் இல்லை.';
 
   @override
-  String get onboardingTitle => 'உங்கள் சுயவிவரத்தை வளர்க்கவும்';
+  String get sevenDayForecast => '7-நாள் முன்னறிவிப்பு';
 
   @override
-  String get onboardingSubtitle => 'உங்கள் அறுவடையைத் தொடங்குவோம்.';
+  String get cropHealthStatus => 'பயிர் சுகாதார நிலை';
+
+  @override
+  String get apr => 'ஏப்';
+
+  @override
+  String get may => 'மே';
+
+  @override
+  String get jun => 'ஜூன்';
+
+  @override
+  String get jul => 'ஜூலை';
+
+  @override
+  String get aug => 'ஆக';
+
+  @override
+  String get sep => 'செப்';
 }

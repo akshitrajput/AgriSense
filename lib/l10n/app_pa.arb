@@ -77,5 +77,13 @@
     "cropTomato": "ਟਮਾਟਰ",
     "cropPotato": "ਆਲੂ",
     "scanHistory": "ਸਕੈਨ ਇਤਿਹਾਸ",
-    "noHistoryRecords": "ਕੋਈ ਇਤਿਹਾਸ ਰਿਕਾਰਡ ਨਹੀਂ ਮਿਲਿਆ।"
+    "noHistoryRecords": "ਕੋਈ ਇਤਿਹਾਸ ਰਿਕਾਰਡ ਨਹੀਂ ਮਿਲਿਆ।",
+    "sevenDayForecast": "੭-ਦਿਨ ਦੀ ਭਵਿੱਖਬਾਣੀ",
+    "cropHealthStatus": "ਫਸਲ ਦੀ ਸਿਹਤ ਸਥਿਤੀ",
+    "apr": "ਅਪ੍ਰੈਲ",
+    "may": "ਮਈ",
+    "jun": "ਜੂਨ",
+    "jul": "ਜੁਲਾਈ",
+    "aug": "ਅਗਸਤ",
+    "sep": "ਸਤੰਬਰ"
 }

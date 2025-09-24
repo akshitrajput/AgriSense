@@ -1,6 +1,5 @@
 {
     "@@locale": "en",
-
     "welcomeMessage": "Welcome,",
     "yourName": "Your Name",
     "close": "Close",
@@ -11,15 +10,10 @@
     "welcomeToAgriSense": "Welcome to AgriSense!",
     "letsGetYouStarted": "Let's get you started with a few details.",
     "selectYourLanguage": "Select Your Language",
-
     "welcomeFarmer": "Welcome, {farmerName}!",
-    "@welcomeFarmer": {
-        "placeholders": {
-            "farmerName": {
-                "type": "String"
-            }
-        }
-    },
+    "@welcomeFarmer": { "placeholders": { "farmerName": { "type": "String" } } },
+    "onboardingTitle": "Cultivating Your Profile",
+    "onboardingSubtitle": "Let's begin your harvest.",
     "onboardingFarmDetails": "Please provide your farm's details to complete your profile.",
     "farmDimensions": "Farm Dimensions",
     "farmLocation": "Farm Location",
@@ -31,7 +25,6 @@
     "numberOfRows": "Number of Rows",
     "plantsPerRow": "Plants per Row",
     "createFarmProfile": "Create Farm Profile",
-
     "farmSummary": "Farm Summary",
     "crop": "Crop:",
     "area": "Area:",
@@ -43,7 +36,6 @@
     "viewFarmMap": "View Farm Map",
     "viewPreviousReports": "View Previous Reports",
     "scanNewPlant": "Scan a New Plant",
-
     "marketAndWeather": "Market & Weather",
     "chennaiWeather": "Chennai Weather",
     "humidity": "Humidity",
@@ -53,11 +45,9 @@
     "tip1": "New organic pesticide shows promising results in early trials.",
     "tip2": "Proper soil aeration can increase crop yield by up to 15%.",
     "tip3": "Consider drip irrigation to conserve water during dry seasons.",
-
     "plantHealthScan": "Plant Health Scan",
     "scanWithCamera": "Scan with Camera",
     "uploadFromStorage": "Upload from Storage",
-
     "plantHealthReport": "Plant Health Report",
     "diseaseDetected": "Disease Detected",
     "severityHigh": "Severity: High",
@@ -67,14 +57,12 @@
     "affectedArea": "Affected Area",
     "recommendedAction": "Recommended Action",
     "applyFungicide": "Apply Fungicide, Isolate Plant",
-
     "farmMapView": "Farm Map View",
     "healthyPlants": "Healthy Plants",
     "affectedPlants": "Affected Plants",
     "cropDetailsTitle": "Crop Details",
     "markAffected": "Mark as Affected",
     "markHealthy": "Mark as Healthy",
-
     "settings": "Settings",
     "farmDetails": "Farm Details",
     "language": "Language",
@@ -82,7 +70,6 @@
     "logOut": "Log Out",
     "selectLanguage": "Select Language",
     "detailsUpdatedMessage": "Details updated successfully!",
-
     "selectCropType": "Select Crop Type",
     "cropWheat": "Wheat",
     "cropMaize": "Maize",
@@ -91,7 +78,12 @@
     "cropPotato": "Potato",
     "scanHistory": "Scan History",
     "noHistoryRecords": "No history records found.",
-    "onboardingTitle": "Cultivating Your Profile",
-    "onboardingSubtitle": "Let's begin your harvest."
+    "sevenDayForecast": "7-Day Forecast",
+    "cropHealthStatus": "Crop Health Status",
+    "apr": "Apr",
+    "may": "May",
+    "jun": "Jun",
+    "jul": "Jul",
+    "aug": "Aug",
+    "sep": "Sep"
 }
-

@@ -44,6 +44,12 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
+  String get onboardingTitle => 'अपनी प्रोफ़ाइल विकसित करें';
+
+  @override
+  String get onboardingSubtitle => 'चलिए आपकी फसल शुरू करते हैं।';
+
+  @override
   String get onboardingFarmDetails =>
       'अपनी प्रोफ़ाइल पूरी करने के लिए कृपया अपने खेत का विवरण प्रदान करें।';
 
@@ -75,7 +81,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get plantsPerRow => 'प्रति पंक्ति पौधे';
 
   @override
-  String get createFarmProfile => 'फार्म प्रोफ़ाइल बनाएं';
+  String get createFarmProfile => 'फार्म प्रोफाइल बनाएं';
 
   @override
   String get farmSummary => 'खेत का सारांश';
@@ -239,8 +245,26 @@ class AppLocalizationsHi extends AppLocalizations {
   String get noHistoryRecords => 'कोई इतिहास रिकॉर्ड नहीं मिला।';
 
   @override
-  String get onboardingTitle => 'अपनी प्रोफ़ाइल विकसित करें';
+  String get sevenDayForecast => '७-दिन का पूर्वानुमान';
 
   @override
-  String get onboardingSubtitle => 'चलिए आपकी फसल शुरू करते हैं।';
+  String get cropHealthStatus => 'फसल स्वास्थ्य स्थिति';
+
+  @override
+  String get apr => 'अप्रै';
+
+  @override
+  String get may => 'मई';
+
+  @override
+  String get jun => 'जून';
+
+  @override
+  String get jul => 'जुलाई';
+
+  @override
+  String get aug => 'अगस्त';
+
+  @override
+  String get sep => 'सितं';
 }

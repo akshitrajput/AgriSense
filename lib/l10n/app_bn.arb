@@ -77,5 +77,13 @@
     "cropTomato": "টমেটো",
     "cropPotato": "আলু",
     "scanHistory": "স্ক্যান ইতিহাস",
-    "noHistoryRecords": "কোনো ইতিহাস রেকর্ড পাওয়া যায়নি।"
+    "noHistoryRecords": "কোনো ইতিহাস রেকর্ড পাওয়া যায়নি।",
+    "sevenDayForecast": "৭-দিনের পূর্বাভাস",
+    "cropHealthStatus": "ফসলের স্বাস্থ্য স্থিতি",
+    "apr": "এপ্রিল",
+    "may": "মে",
+    "jun": "জুন",
+    "jul": "জুলাই",
+    "aug": "আগস্ট",
+    "sep": "সেপ্টেম্বর"
 }

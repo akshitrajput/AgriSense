@@ -77,5 +77,13 @@
     "cropTomato": "ટામેટા",
     "cropPotato": "બટાકા",
     "scanHistory": "સ્કેન ઇતિહાસ",
-    "noHistoryRecords": "કોઈ ઇતિહાસ રેકોર્ડ મળ્યો નથી."
+    "noHistoryRecords": "કોઈ ઇતિહાસ રેકોર્ડ મળ્યો નથી.",
+    "sevenDayForecast": "૭-દિવસનું પૂર્વાનુમાન",
+    "cropHealthStatus": "પાક આરોગ્ય સ્થિતિ",
+    "apr": "એપ્રિલ",
+    "may": "મે",
+    "jun": "જૂન",
+    "jul": "જુલાઈ",
+    "aug": "ઓગસ્ટ",
+    "sep": "સપ્ટેમ્બર"
 }

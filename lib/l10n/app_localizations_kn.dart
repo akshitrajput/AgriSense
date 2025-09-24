@@ -44,6 +44,12 @@ class AppLocalizationsKn extends AppLocalizations {
   }
 
   @override
+  String get onboardingTitle => 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಬೆಳೆಸುವುದು';
+
+  @override
+  String get onboardingSubtitle => 'ನಿಮ್ಮ ಸುಗ್ಗಿಯನ್ನು ಪ್ರಾರಂಭಿಸೋಣ.';
+
+  @override
   String get onboardingFarmDetails =>
       'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ದಯವಿಟ್ಟು ನಿಮ್ಮ ಜಮೀನಿನ ವಿವರಗಳನ್ನು ಒದಗಿಸಿ.';
 
@@ -240,8 +246,26 @@ class AppLocalizationsKn extends AppLocalizations {
   String get noHistoryRecords => 'ಯಾವುದೇ ಇತಿಹಾಸದ ದಾಖಲೆಗಳು ಕಂಡುಬಂದಿಲ್ಲ.';
 
   @override
-  String get onboardingTitle => 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಬೆಳೆಸುವುದು';
+  String get sevenDayForecast => '7-ದಿನದ ಮುನ್ಸೂಚನೆ';
 
   @override
-  String get onboardingSubtitle => 'ನಿಮ್ಮ ಸುಗ್ಗಿಯನ್ನು ಪ್ರಾರಂಭಿಸೋಣ.';
+  String get cropHealthStatus => 'ಬೆಳೆ ಆರೋಗ್ಯ ಸ್ಥಿತಿ';
+
+  @override
+  String get apr => 'ಏಪ್ರಿಲ್';
+
+  @override
+  String get may => 'ಮೇ';
+
+  @override
+  String get jun => 'ಜೂನ್';
+
+  @override
+  String get jul => 'ಜುಲೈ';
+
+  @override
+  String get aug => 'ಆಗಸ್ಟ್';
+
+  @override
+  String get sep => 'ಸೆಪ್ಟೆಂಬರ್';
 }

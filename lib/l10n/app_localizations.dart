@@ -182,6 +182,18 @@ abstract class AppLocalizations {
   /// **'Welcome, {farmerName}!'**
   String welcomeFarmer(String farmerName);
 
+  /// No description provided for @onboardingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cultivating Your Profile'**
+  String get onboardingTitle;
+
+  /// No description provided for @onboardingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s begin your harvest.'**
+  String get onboardingSubtitle;
+
   /// No description provided for @onboardingFarmDetails.
   ///
   /// In en, this message translates to:
@@ -566,17 +578,53 @@ abstract class AppLocalizations {
   /// **'No history records found.'**
   String get noHistoryRecords;
 
-  /// No description provided for @onboardingTitle.
+  /// No description provided for @sevenDayForecast.
   ///
   /// In en, this message translates to:
-  /// **'Cultivating Your Profile'**
-  String get onboardingTitle;
+  /// **'7-Day Forecast'**
+  String get sevenDayForecast;
 
-  /// No description provided for @onboardingSubtitle.
+  /// No description provided for @cropHealthStatus.
   ///
   /// In en, this message translates to:
-  /// **'Let\'s begin your harvest.'**
-  String get onboardingSubtitle;
+  /// **'Crop Health Status'**
+  String get cropHealthStatus;
+
+  /// No description provided for @apr.
+  ///
+  /// In en, this message translates to:
+  /// **'Apr'**
+  String get apr;
+
+  /// No description provided for @may.
+  ///
+  /// In en, this message translates to:
+  /// **'May'**
+  String get may;
+
+  /// No description provided for @jun.
+  ///
+  /// In en, this message translates to:
+  /// **'Jun'**
+  String get jun;
+
+  /// No description provided for @jul.
+  ///
+  /// In en, this message translates to:
+  /// **'Jul'**
+  String get jul;
+
+  /// No description provided for @aug.
+  ///
+  /// In en, this message translates to:
+  /// **'Aug'**
+  String get aug;
+
+  /// No description provided for @sep.
+  ///
+  /// In en, this message translates to:
+  /// **'Sep'**
+  String get sep;
 }
 
 class _AppLocalizationsDelegate

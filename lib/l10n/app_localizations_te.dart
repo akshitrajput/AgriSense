@@ -44,6 +44,12 @@ class AppLocalizationsTe extends AppLocalizations {
   }
 
   @override
+  String get onboardingTitle => 'మీ ప్రొఫైల్‌ను పండించడం';
+
+  @override
+  String get onboardingSubtitle => 'మీ పంటకోతను ప్రారంభిద్దాం.';
+
+  @override
   String get onboardingFarmDetails =>
       'మీ ప్రొఫైల్‌ను పూర్తి చేయడానికి దయచేసి మీ పొలం వివరాలను అందించండి.';
 
@@ -240,8 +246,26 @@ class AppLocalizationsTe extends AppLocalizations {
   String get noHistoryRecords => 'చరిత్ర రికార్డులు ఏవీ కనుగొనబడలేదు.';
 
   @override
-  String get onboardingTitle => 'మీ ప్రొఫైల్‌ను పండించడం';
+  String get sevenDayForecast => '7-రోజుల సూచన';
 
   @override
-  String get onboardingSubtitle => 'మీ పంటకోతను ప్రారంభిద్దాం.';
+  String get cropHealthStatus => 'పంట ఆరోగ్య స్థితి';
+
+  @override
+  String get apr => 'ఏప్రిల్';
+
+  @override
+  String get may => 'మే';
+
+  @override
+  String get jun => 'జూన్';
+
+  @override
+  String get jul => 'జూలై';
+
+  @override
+  String get aug => 'ఆగస్టు';
+
+  @override
+  String get sep => 'సెప్టెంబర్';
 }
