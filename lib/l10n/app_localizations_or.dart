@@ -267,4 +267,10 @@ class AppLocalizationsOr extends AppLocalizations {
 
   @override
   String get sep => 'ସେପ୍ଟେମ୍ବର';
+
+  @override
+  String get email => 'Email ID';
+
+  @override
+  String get password => 'Password';
 }

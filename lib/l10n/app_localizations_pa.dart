@@ -268,4 +268,10 @@ class AppLocalizationsPa extends AppLocalizations {
 
   @override
   String get sep => 'ਸਤੰਬਰ';
+
+  @override
+  String get email => 'Email ID';
+
+  @override
+  String get password => 'Password';
 }

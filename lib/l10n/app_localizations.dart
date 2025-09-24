@@ -625,6 +625,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sep'**
   String get sep;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email ID'**
+  String get email;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
 }
 
 class _AppLocalizationsDelegate

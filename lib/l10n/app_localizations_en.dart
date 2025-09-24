@@ -268,4 +268,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sep => 'Sep';
+
+  @override
+  String get email => 'Email ID';
+
+  @override
+  String get password => 'Password';
 }

@@ -268,4 +268,10 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get sep => 'సెప్టెంబర్';
+
+  @override
+  String get email => 'Email ID';
+
+  @override
+  String get password => 'Password';
 }

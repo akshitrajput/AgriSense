@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "1018029801955",
-    "project_id": "agrisense-pot511",
-    "storage_bucket": "agrisense-pot511.firebasestorage.app"
+    "project_number": "852916987468",
+    "project_id": "agrisense-pot511-1e6f7",
+    "storage_bucket": "agrisense-pot511-1e6f7.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1018029801955:android:ddfed1d82ee8d947aca0d6",
+        "mobilesdk_app_id": "1:852916987468:android:2a526f090414adbb29b6e9",
         "android_client_info": {
           "package_name": "com.example.agrisense"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCd6q2WXFocCzIq-A3l_snTpaFragqP3GM"
+          "current_key": "AIzaSyDIBQnBVG7Ax8dm_YPm5TGQC2haWjMaloQ"
         }
       ],
       "services": {

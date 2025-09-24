@@ -268,4 +268,10 @@ class AppLocalizationsKn extends AppLocalizations {
 
   @override
   String get sep => 'ಸೆಪ್ಟೆಂಬರ್';
+
+  @override
+  String get email => 'Email ID';
+
+  @override
+  String get password => 'Password';
 }

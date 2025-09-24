@@ -270,4 +270,10 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get sep => 'செப்';
+
+  @override
+  String get email => 'மின்னஞ்சல் முகவரி';
+
+  @override
+  String get password => 'கடவுச்சொல்';
 }

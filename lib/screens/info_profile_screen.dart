@@ -1,7 +1,9 @@
 import 'package:agrisense/providers/language_provider.dart';
+import 'package:agrisense/screens/main_screen.dart';
 import 'package:agrisense/screens/onboarding_screen.dart';
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
@@ -23,9 +25,10 @@ class InfoProfileScreen extends StatefulWidget {
 class _InfoProfileScreenState extends State<InfoProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   final _languageSearchController = TextEditingController();
 
-  // CHANGE: Updated the list to include all languages
   final List<Language> _languages = [
     Language('en', 'English'),
     Language('hi', 'हिन्दी (Hindi)'),
@@ -42,6 +45,7 @@ class _InfoProfileScreenState extends State<InfoProfileScreen> {
     Language('as', 'অসমীয়া (Assamese)'),
   ];
   Language? _selectedLanguage;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -49,7 +53,7 @@ class _InfoProfileScreenState extends State<InfoProfileScreen> {
     final provider = Provider.of<LanguageProvider>(context, listen: false);
     final currentLangCode = provider.appLocale.languageCode;
     _selectedLanguage = _languages.firstWhere(
-          (lang) => lang.code == currentLangCode,
+      (lang) => lang.code == currentLangCode,
       orElse: () => _languages.first,
     );
   }
@@ -57,18 +61,54 @@ class _InfoProfileScreenState extends State<InfoProfileScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     _languageSearchController.dispose();
     super.dispose();
   }
 
-  void _submitProfile() {
-    if (_formKey.currentState!.validate()) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => OnboardingScreen(farmerName: _nameController.text),
-        ),
+  Future<void> _submitProfile() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
+
+    try {
+      // First, try to sign in. If this works, the user already exists.
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
       );
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+      }
+    } on FirebaseAuthException {
+      // If sign-in fails, assume it's a new user.
+      // Pass all details to the next screen to create the account there.
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OnboardingScreen(
+              farmerName: _nameController.text.trim(),
+              email: _emailController.text.trim(),
+              password: _passwordController.text,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -116,7 +156,40 @@ class _InfoProfileScreenState extends State<InfoProfileScreen> {
                           children: [
                             Text(localizations.yourName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                             const SizedBox(height: 8),
-                            _buildTextFormField(localizations),
+                            _buildTextFormField(
+                              controller: _nameController,
+                              hintText: localizations.yourName,
+                              icon: Icons.person_outline,
+                              validator: (value) => value!.trim().isEmpty ? 'Please enter your name' : null,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(localizations.email, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                            const SizedBox(height: 8),
+                            _buildTextFormField(
+                              controller: _emailController,
+                              hintText: 'you@example.com',
+                              icon: Icons.email_outlined,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) return 'Please enter your email';
+                                if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) return 'Please enter a valid email address';
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            Text(localizations.password, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                            const SizedBox(height: 8),
+                            _buildTextFormField(
+                              controller: _passwordController,
+                              hintText: 'Enter your password',
+                              icon: Icons.lock_outline,
+                              isPassword: true,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) return 'Please enter a password';
+                                if (value.length < 6) return 'Password must be at least 6 characters';
+                                return null;
+                              },
+                            ),
                             const SizedBox(height: 24),
                             Text(localizations.selectYourLanguage, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                             const SizedBox(height: 8),
@@ -128,8 +201,10 @@ class _InfoProfileScreenState extends State<InfoProfileScreen> {
                   ),
                   const SizedBox(height: 32),
                   ElevatedButton(
-                    onPressed: _submitProfile,
-                    child: Text(localizations.continueButton),
+                    onPressed: _isLoading ? null : _submitProfile,
+                    child: _isLoading
+                        ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
+                        : Text(localizations.continueButton),
                   ),
                 ],
               ),
@@ -140,14 +215,23 @@ class _InfoProfileScreenState extends State<InfoProfileScreen> {
     );
   }
 
-  Widget _buildTextFormField(AppLocalizations localizations) {
+  Widget _buildTextFormField({
+    required TextEditingController controller,
+    required String hintText,
+    required IconData icon,
+    String? Function(String?)? validator,
+    TextInputType? keyboardType,
+    bool isPassword = false,
+  }) {
     return TextFormField(
-      controller: _nameController,
+      controller: controller,
+      validator: validator,
+      keyboardType: keyboardType,
+      obscureText: isPassword,
       decoration: InputDecoration(
-        hintText: localizations.yourName,
-        prefixIcon: const Icon(Icons.person_outline, color: AppTheme.subTextColor),
+        hintText: hintText,
+        prefixIcon: Icon(icon, color: AppTheme.subTextColor),
       ),
-      validator: (value) => value!.trim().isEmpty ? 'Please enter your name' : null,
     );
   }
 

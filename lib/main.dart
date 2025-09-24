@@ -9,15 +9,21 @@ import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+// ADDED: Imports for Firebase
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
 import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ADDED: Initialize Firebase before other services
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   final dir = await getApplicationDocumentsDirectory();
-  await Isar.open(
-    [ScanRecordSchema],
-    directory: dir.path,
-  );
+  await Isar.open([ScanRecordSchema], directory: dir.path);
 
   final prefs = await SharedPreferences.getInstance();
   final String? languageCode = prefs.getString('language_code');
@@ -25,7 +31,9 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => LanguageProvider(languageCode)),
+        ChangeNotifierProvider(
+          create: (context) => LanguageProvider(languageCode),
+        ),
         ChangeNotifierProvider(create: (context) => FarmDataProvider()),
       ],
       child: const AgriSenseApp(),
@@ -45,9 +53,6 @@ class AgriSenseApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           debugShowCheckedModeBanner: false,
           locale: languageProvider.appLocale,
-          
-          // These two properties make the translations available to your whole app.
-          // They must be set correctly.
           supportedLocales: const [
             Locale('en', ''),
             Locale('hi', ''),
@@ -55,21 +60,19 @@ class AgriSenseApp extends StatelessWidget {
             Locale('bn', ''),
             Locale('te', ''),
             Locale('mr', ''),
-            Locale('ur', ''),
             Locale('gu', ''),
             Locale('kn', ''),
             Locale('or', ''),
             Locale('ml', ''),
             Locale('pa', ''),
-            Locale('as', ''),
           ],
+
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          
           home: const SplashScreen(),
         );
       },

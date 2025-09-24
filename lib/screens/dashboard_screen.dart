@@ -9,10 +9,11 @@ import 'package:agrisense/services/weather_service.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:agrisense/theme/app_theme.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
+
+// NOTE: The fl_chart import has been removed as it's no longer needed.
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -61,8 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             _buildWeatherForecastCard(),
             const SizedBox(height: 24),
-            _buildHealthStatusCard(localizations),
-            const SizedBox(height: 24),
+            // REMOVED: The call to _buildHealthStatusCard(localizations)
             _buildActionButtons(localizations, farmData),
           ],
         ),
@@ -186,129 +186,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildHealthStatusCard(AppLocalizations localizations) {
-    final List<FlSpot> dummySpots = [
-      const FlSpot(0, 100), const FlSpot(1, 85), const FlSpot(2, 70),
-      const FlSpot(3, 80), const FlSpot(4, 90), const FlSpot(5, 95),
-    ];
-
-    return Card(
-      elevation: 4,
-      shadowColor: AppTheme.primaryColor.withOpacity(0.2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Crop Health Status",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              height: 180,
-              child: LineChart(
-                LineChartData(
-                  gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: false,
-                    getDrawingHorizontalLine: (val) {
-                      return const FlLine(
-                        color: AppTheme.borderColor,
-                        strokeWidth: 1,
-                      );
-                    },
-                  ),
-                  titlesData: FlTitlesData(
-                    show: true,
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 30,
-                        interval: 1,
-                        getTitlesWidget: bottomTitleWidgets,
-                      ),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: 25,
-                        getTitlesWidget: leftTitleWidgets,
-                        reservedSize: 42,
-                      ),
-                    ),
-                  ),
-                  borderData: FlBorderData(
-                    show: true,
-                    border: Border.all(color: AppTheme.borderColor),
-                  ),
-                  minX: 0, maxX: 5, minY: 0, maxY: 100,
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: dummySpots,
-                      isCurved: true,
-                      gradient: const LinearGradient(
-                        colors: [AppTheme.primaryColor, Colors.green],
-                      ),
-                      barWidth: 5,
-                      isStrokeCapRound: true,
-                      dotData: const FlDotData(show: true),
-                      belowBarData: BarAreaData(
-                        show: true,
-                        gradient: LinearGradient(
-                          colors: [
-                            AppTheme.primaryColor.withOpacity(0.3),
-                            Colors.green.withOpacity(0.0),
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 12,
-      color: AppTheme.subTextColor,
-    );
-    Widget text;
-    switch (value.toInt()) {
-      case 0: text = const Text('Apr', style: style); break;
-      case 1: text = const Text('May', style: style); break;
-      case 2: text = const Text('Jun', style: style); break;
-      case 3: text = const Text('Jul', style: style); break;
-      case 4: text = const Text('Aug', style: style); break;
-      case 5: text = const Text('Sep', style: style); break;
-      default: text = const Text('', style: style); break;
-    }
-    // FIX: Return the Text widget directly
-    return text;
-  }
-
-  Widget leftTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 12,
-      color: AppTheme.subTextColor,
-    );
-    if (value.toInt() % 25 == 0) {
-      return Text('${value.toInt()}%', style: style, textAlign: TextAlign.left);
-    }
-    return Container();
-  }
+  // REMOVED: The entire _buildHealthStatusCard widget and its helper methods
+  // (bottomTitleWidgets and leftTitleWidgets) are now gone.
 
   Widget _buildActionButtons(AppLocalizations localizations, FarmData farmData) {
     return Column(
@@ -357,7 +236,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const HistoryScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const HistoryScreen()),
                     );
                   },
                 ),
@@ -374,11 +254,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             );
           },
           icon: const Icon(Icons.camera_alt_outlined, color: Colors.white),
-          label: Text(localizations.scanNewPlant, style: const TextStyle(color: Colors.white)),
+          label: Text(localizations.scanNewPlant,
+              style: const TextStyle(color: Colors.white)),
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
             backgroundColor: AppTheme.primaryColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16)),
             elevation: 4,
           ),
         ),
@@ -386,7 +268,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildActionButtonRow({required IconData icon, required String label, required VoidCallback onPressed}) {
+  Widget _buildActionButtonRow(
+      {required IconData icon,
+        required String label,
+        required VoidCallback onPressed}) {
     return InkWell(
       onTap: onPressed,
       borderRadius: BorderRadius.circular(12),
@@ -399,10 +284,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style:
+                const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
             ),
-            const Icon(Icons.arrow_forward_ios, color: AppTheme.subTextColor, size: 16),
+            const Icon(Icons.arrow_forward_ios,
+                color: AppTheme.subTextColor, size: 16),
           ],
         ),
       ),

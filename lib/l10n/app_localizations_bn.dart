@@ -266,4 +266,10 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get sep => 'সেপ্টেম্বর';
+
+  @override
+  String get email => 'Email ID';
+
+  @override
+  String get password => 'Password';
 }

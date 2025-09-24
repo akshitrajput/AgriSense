@@ -267,4 +267,10 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get sep => 'सितं';
+
+  @override
+  String get email => 'ईमेल आईडी';
+
+  @override
+  String get password => 'पासवर्ड';
 }

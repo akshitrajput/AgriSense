@@ -266,4 +266,10 @@ class AppLocalizationsGu extends AppLocalizations {
 
   @override
   String get sep => 'સપ્ટેમ્બર';
+
+  @override
+  String get email => 'Email ID';
+
+  @override
+  String get password => 'Password';
 }

@@ -85,5 +85,7 @@
     "jun": "Jun",
     "jul": "Jul",
     "aug": "Aug",
-    "sep": "Sep"
+    "sep": "Sep",
+    "email": "Email ID",
+    "password": "Password"
 }

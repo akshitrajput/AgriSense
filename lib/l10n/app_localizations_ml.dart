@@ -267,4 +267,10 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get sep => 'സെപ്റ്റംബർ';
+
+  @override
+  String get email => 'Email ID';
+
+  @override
+  String get password => 'Password';
 }
