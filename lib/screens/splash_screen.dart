@@ -21,16 +21,13 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigateToNextScreen() async {
-    // Wait for the splash animation to be visible
+    // Wait for a minimum splash duration for a good user experience
     await Future.delayed(const Duration(seconds: 3));
 
     if (mounted) {
       final farmDataProvider = context.read<FarmDataProvider>();
 
-      // **THE FIX IS HERE:**
-      // We will now wait until the provider's `isLoading` flag becomes false.
-      // This guarantees that we don't check for onboarding status until
-      // the data has been loaded from storage.
+      // This loop waits until the provider has finished loading its initial data
       while (farmDataProvider.isLoading) {
         await Future.delayed(const Duration(milliseconds: 100));
       }
@@ -83,4 +80,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-

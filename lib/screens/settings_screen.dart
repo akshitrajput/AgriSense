@@ -6,6 +6,7 @@ import 'package:agrisense/screens/splash_screen.dart';
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // ADDED: Import Firebase Auth
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -37,7 +38,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Map<String, String> _translatedCrops = {};
 
   Language? _selectedLanguage;
-  // CHANGE: Expanded the list to include all supported languages
   final List<Language> _languages = [
     Language('en', 'English'),
     Language('hi', 'हिन्दी (Hindi)'),
@@ -130,7 +130,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
   
   Future<void> _logout() async {
-    await context.read<FarmDataProvider>().clearData();
+    // ADDED: This line signs the user out of their Firebase session.
+    await FirebaseAuth.instance.signOut();
+    
+    // This line clears the local farm data
+    if (mounted) {
+      await context.read<FarmDataProvider>().clearData();
+    }
+    
+    // This navigates the user back to the start of the app
     if (mounted) {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const SplashScreen()),
@@ -222,45 +230,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           );
         }).toList(),
         value: _selectedCropKey,
-        onChanged: (String? value) {
-          setState(() {
-            _selectedCropKey = value;
-          });
-        },
-        buttonStyleData: ButtonStyleData(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          height: 50,
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppTheme.borderColor)),
-        ),
-        dropdownStyleData: DropdownStyleData(maxHeight: 200, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12))),
-        menuItemStyleData: const MenuItemStyleData(height: 40),
-        dropdownSearchData: DropdownSearchData(
-          searchController: _cropSearchController,
-          searchInnerWidgetHeight: 50,
-          searchInnerWidget: Container(
-            height: 50,
-            padding: const EdgeInsets.only(top: 8, bottom: 4, right: 8, left: 8),
-            child: TextFormField(
-              expands: true,
-              maxLines: null,
-              controller: _cropSearchController,
-              decoration: InputDecoration(
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                hintText: 'Search for a crop...',
-                hintStyle: const TextStyle(fontSize: 12),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-            ),
-          ),
-          searchMatchFn: (item, searchValue) {
-            final textChild = item.child as Text;
-            return textChild.data.toString().toLowerCase().contains(searchValue.toLowerCase());
-          },
-        ),
-        onMenuStateChange: (isOpen) {
-          if (!isOpen) _cropSearchController.clear();
-        },
+        onChanged: (String? newValue) => setState(() => _selectedCropKey = newValue),
       ),
     );
   }
@@ -271,7 +241,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: DropdownButton2<Language>(
         isExpanded: true,
         hint: Text(localizations.selectLanguage, style: TextStyle(fontSize: 14, color: Theme.of(context).hintColor)),
-        items: _languages.map((Language item) => DropdownMenuItem<Language>(value: item, child: Text(item.name, style: const TextStyle(fontSize: 14)))).toList(),
+        items: _languages.map((Language lang) {
+          return DropdownMenuItem<Language>(value: lang, child: Text(lang.name));
+        }).toList(),
         value: _selectedLanguage,
         onChanged: (Language? language) {
           if (language != null) {
