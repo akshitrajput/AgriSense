@@ -1,11 +1,10 @@
-import 'dart:io';
 import 'package:agrisense/models/scan_record.dart';
-import 'package:agrisense/screens/health_report_screen.dart';
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
+import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
 import '../l10n/app_localizations.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -21,6 +20,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   void initState() {
     super.initState();
+    // It's good practice to get the Isar instance once.
     isar = Isar.getInstance()!;
   }
 
@@ -29,9 +29,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final localizations = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: CustomAppBar(title: localizations.scanHistory, hasBackButton: true),
+      backgroundColor: AppTheme.backgroundColor,
+      appBar:
+      CustomAppBar(title: localizations.scanHistory, hasBackButton: true),
       body: StreamBuilder<List<ScanRecord>>(
-        stream: isar.scanRecords.where().sortByScanDateDesc().watch(fireImmediately: true),
+        // Use a StreamBuilder to listen for real-time changes in the database.
+        // New scans will appear here automatically.
+        stream: isar.scanRecords
+            .where()
+            .sortByScanDateDesc()
+            .watch(fireImmediately: true),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -43,7 +50,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
             return Center(
               child: Text(
                 localizations.noHistoryRecords,
-                style: const TextStyle(fontSize: 16, color: AppTheme.subTextColor),
+                style:
+                const TextStyle(fontSize: 16, color: AppTheme.subTextColor),
               ),
             );
           }
@@ -58,27 +66,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
+                elevation: 2,
+                shadowColor: Colors.black.withOpacity(0.1),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 child: ListTile(
-                  leading: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.file(
-                      File(record.imagePath),
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stack) => Container(
-                        width: 50, height: 50, color: AppTheme.borderColor,
-                        child: const Icon(Icons.image_not_supported_outlined),
-                      ),
-                    ),
-                  ),
-                  title: Text(record.diseaseName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text(DateFormat.yMMMd().format(record.scanDate)),
+                  leading: const Icon(Icons.picture_as_pdf_rounded,
+                      color: AppTheme.primaryColor, size: 36),
+                  title: Text(record.diseaseName,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(
+                      DateFormat.yMMMd().add_jm().format(record.scanDate)),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  // **CHANGE:** The onTap action now opens the saved PDF file.
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => HealthReportScreen(report: record))
-                    );
+                    if (record.reportPdfPath != null &&
+                        record.reportPdfPath!.isNotEmpty) {
+                      OpenFile.open(record.reportPdfPath);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content:
+                            Text("PDF report not found for this scan.")),
+                      );
+                    }
                   },
                 ),
               );
@@ -89,3 +100,4 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 }
+

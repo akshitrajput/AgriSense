@@ -32,8 +32,13 @@ const ScanRecordSchema = CollectionSchema(
       name: r'probability',
       type: IsarType.double,
     ),
-    r'scanDate': PropertySchema(
+    r'reportPdfPath': PropertySchema(
       id: 3,
+      name: r'reportPdfPath',
+      type: IsarType.string,
+    ),
+    r'scanDate': PropertySchema(
+      id: 4,
       name: r'scanDate',
       type: IsarType.dateTime,
     )
@@ -74,6 +79,12 @@ int _scanRecordEstimateSize(
   var bytesCount = offsets.last;
   bytesCount += 3 + object.diseaseName.length * 3;
   bytesCount += 3 + object.imagePath.length * 3;
+  {
+    final value = object.reportPdfPath;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -86,7 +97,8 @@ void _scanRecordSerialize(
   writer.writeString(offsets[0], object.diseaseName);
   writer.writeString(offsets[1], object.imagePath);
   writer.writeDouble(offsets[2], object.probability);
-  writer.writeDateTime(offsets[3], object.scanDate);
+  writer.writeString(offsets[3], object.reportPdfPath);
+  writer.writeDateTime(offsets[4], object.scanDate);
 }
 
 ScanRecord _scanRecordDeserialize(
@@ -100,7 +112,8 @@ ScanRecord _scanRecordDeserialize(
   object.id = id;
   object.imagePath = reader.readString(offsets[1]);
   object.probability = reader.readDouble(offsets[2]);
-  object.scanDate = reader.readDateTime(offsets[3]);
+  object.reportPdfPath = reader.readStringOrNull(offsets[3]);
+  object.scanDate = reader.readDateTime(offsets[4]);
   return object;
 }
 
@@ -118,6 +131,8 @@ P _scanRecordDeserializeProp<P>(
     case 2:
       return (reader.readDouble(offset)) as P;
     case 3:
+      return (reader.readStringOrNull(offset)) as P;
+    case 4:
       return (reader.readDateTime(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -702,6 +717,160 @@ extension ScanRecordQueryFilter
     });
   }
 
+  QueryBuilder<ScanRecord, ScanRecord, QAfterFilterCondition>
+      reportPdfPathIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'reportPdfPath',
+      ));
+    });
+  }
+
+  QueryBuilder<ScanRecord, ScanRecord, QAfterFilterCondition>
+      reportPdfPathIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'reportPdfPath',
+      ));
+    });
+  }
+
+  QueryBuilder<ScanRecord, ScanRecord, QAfterFilterCondition>
+      reportPdfPathEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'reportPdfPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScanRecord, ScanRecord, QAfterFilterCondition>
+      reportPdfPathGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'reportPdfPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScanRecord, ScanRecord, QAfterFilterCondition>
+      reportPdfPathLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'reportPdfPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScanRecord, ScanRecord, QAfterFilterCondition>
+      reportPdfPathBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'reportPdfPath',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScanRecord, ScanRecord, QAfterFilterCondition>
+      reportPdfPathStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'reportPdfPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScanRecord, ScanRecord, QAfterFilterCondition>
+      reportPdfPathEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'reportPdfPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScanRecord, ScanRecord, QAfterFilterCondition>
+      reportPdfPathContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'reportPdfPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScanRecord, ScanRecord, QAfterFilterCondition>
+      reportPdfPathMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'reportPdfPath',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ScanRecord, ScanRecord, QAfterFilterCondition>
+      reportPdfPathIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'reportPdfPath',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<ScanRecord, ScanRecord, QAfterFilterCondition>
+      reportPdfPathIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'reportPdfPath',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<ScanRecord, ScanRecord, QAfterFilterCondition> scanDateEqualTo(
       DateTime value) {
     return QueryBuilder.apply(this, (query) {
@@ -801,6 +970,18 @@ extension ScanRecordQuerySortBy
     });
   }
 
+  QueryBuilder<ScanRecord, ScanRecord, QAfterSortBy> sortByReportPdfPath() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reportPdfPath', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ScanRecord, ScanRecord, QAfterSortBy> sortByReportPdfPathDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reportPdfPath', Sort.desc);
+    });
+  }
+
   QueryBuilder<ScanRecord, ScanRecord, QAfterSortBy> sortByScanDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'scanDate', Sort.asc);
@@ -864,6 +1045,18 @@ extension ScanRecordQuerySortThenBy
     });
   }
 
+  QueryBuilder<ScanRecord, ScanRecord, QAfterSortBy> thenByReportPdfPath() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reportPdfPath', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ScanRecord, ScanRecord, QAfterSortBy> thenByReportPdfPathDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reportPdfPath', Sort.desc);
+    });
+  }
+
   QueryBuilder<ScanRecord, ScanRecord, QAfterSortBy> thenByScanDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'scanDate', Sort.asc);
@@ -899,6 +1092,14 @@ extension ScanRecordQueryWhereDistinct
     });
   }
 
+  QueryBuilder<ScanRecord, ScanRecord, QDistinct> distinctByReportPdfPath(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'reportPdfPath',
+          caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<ScanRecord, ScanRecord, QDistinct> distinctByScanDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'scanDate');
@@ -929,6 +1130,12 @@ extension ScanRecordQueryProperty
   QueryBuilder<ScanRecord, double, QQueryOperations> probabilityProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'probability');
+    });
+  }
+
+  QueryBuilder<ScanRecord, String?, QQueryOperations> reportPdfPathProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'reportPdfPath');
     });
   }
 

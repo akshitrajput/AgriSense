@@ -1,16 +1,22 @@
 import 'dart:io';
 import 'package:agrisense/models/scan_record.dart';
-import 'package:agrisense/screens/health_report_screen.dart';
+import 'package:agrisense/providers/language_provider.dart';
 import 'package:agrisense/services/api_service.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:isar/isar.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 
 class PlantScanScreen extends StatefulWidget {
-  const PlantScanScreen({super.key});
+  final int? row;
+  final int? col;
+
+  const PlantScanScreen({super.key, this.row, this.col});
   @override
   State<PlantScanScreen> createState() => _PlantScanScreenState();
 }
@@ -20,6 +26,9 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
   bool _isAnalyzing = false;
 
   Future<void> _pickAndAnalyzeImage(ImageSource source) async {
+    final languageCode =
+        Provider.of<LanguageProvider>(context, listen: false).appLocale.languageCode;
+
     final XFile? pickedFile = await _picker.pickImage(
       source: source,
       maxWidth: 1024,
@@ -32,25 +41,25 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
     setState(() => _isAnalyzing = true);
 
     try {
-      final Map<String, dynamic> analysisResult =
-      await ApiService.analyzePlant(imageFile);
+      final int row = widget.row ?? 0;
+      final int col = widget.col ?? 0;
 
-      // **CHANGE 1:** Parse the new combined response structure from the backend.
-      final kindwiseAnalysis = analysisResult['kindwise_analysis'];
-      final pesticideRecommendation = analysisResult['pesticide_recommendation'];
+      final pdfBytes =
+      await ApiService.analyzePlantAndGetPdf(imageFile, languageCode, row, col);
 
-      final suggestions =
-      kindwiseAnalysis['result']?['disease']?['suggestions'];
-      final isHealthy = (suggestions == null || suggestions.isEmpty);
+      // **CHANGE 1:** Save the PDF to a permanent app directory, not temporary.
+      final appDir = await getApplicationDocumentsDirectory();
+      final filePath =
+          '${appDir.path}/AgriSense_Report_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      final file = File(filePath);
+      await file.writeAsBytes(pdfBytes);
 
-      // Create the record for the local database. Note: The recommendation is not saved here.
       final newRecord = ScanRecord()
         ..imagePath = imageFile.path
         ..scanDate = DateTime.now()
-        ..diseaseName =
-        isHealthy ? "Healthy" : (suggestions[0]['name'] ?? 'Unknown Disease')
-        ..probability =
-        isHealthy ? 1.0 : (suggestions[0]['probability'] ?? 0.0);
+        ..diseaseName = "Analysis Report for Plant (${row + 1}, ${col + 1})"
+        ..probability = 1.0 // Placeholder
+        ..reportPdfPath = filePath;
 
       final isar = Isar.getInstance()!;
       await isar.writeTxn(() async {
@@ -58,17 +67,8 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
       });
 
       if (mounted) {
-        // **CHANGE 2:** Pass both the database record AND the new recommendation
-        // to the HealthReportScreen.
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HealthReportScreen(
-              report: newRecord,
-              recommendation: pesticideRecommendation,
-            ),
-          ),
-        );
+        // **CHANGE 2:** Show a success dialog instead of opening the file directly.
+        _showSuccessDialog(filePath);
       }
     } catch (e) {
       if (mounted) {
@@ -84,6 +84,39 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
         setState(() => _isAnalyzing = false);
       }
     }
+  }
+
+  // **CHANGE 3:** New method to show the success dialog with a "View Report" button.
+  void _showSuccessDialog(String pdfPath) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // User must interact with the dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text("Report Generated"),
+          content: const Text(
+              "Your plant health report has been successfully generated and saved to your history."),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.picture_as_pdf_outlined),
+              label: const Text("View Report"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog first
+                OpenFile.open(pdfPath); // Then open the PDF
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -102,7 +135,7 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
             const CircularProgressIndicator(color: AppTheme.primaryColor),
             const SizedBox(height: 20),
             Text(
-              'Analyzing Plant...',
+              'Generating PDF Report...',
               style:
               TextStyle(fontSize: 16, color: AppTheme.subTextColor),
             ),
@@ -179,3 +212,4 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
     );
   }
 }
+

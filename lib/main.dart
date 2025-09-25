@@ -45,9 +45,7 @@ class AgriSenseApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           debugShowCheckedModeBanner: false,
           locale: languageProvider.appLocale,
-          
-          // These two properties make the translations available to your whole app.
-          // They must be set correctly.
+
           supportedLocales: const [
             Locale('en', ''),
             Locale('hi', ''),

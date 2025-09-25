@@ -15,4 +15,8 @@ class ScanRecord {
   // Data from the API response
   late String diseaseName;
   late double probability;
+
+  // **CHANGE:** Add a field to store the path of the saved PDF report.
+  String? reportPdfPath;
 }
+
