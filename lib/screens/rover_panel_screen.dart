@@ -1,7 +1,3 @@
-// **STEP 1: Add required imports for map functionality**
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
-
 import 'package:agrisense/providers/farm_data_provider.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -21,9 +17,6 @@ class _RoverPanelScreenState extends State<RoverPanelScreen> {
   final double _tankCapacity = 0.75; // 75%
   final double _powerCharge = 0.90; // 90%
 
-  // **STEP 2: Define Rover's location coordinates**
-  final LatLng _roverLocation = const LatLng(12.8406, 80.1534); // VIT Chennai
-
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -32,7 +25,6 @@ class _RoverPanelScreenState extends State<RoverPanelScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: const CustomAppBar(title: "Rover Control Panel"),
-      // **STEP 3: Removed the Stack widget as the FAB is no longer needed**
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -41,67 +33,8 @@ class _RoverPanelScreenState extends State<RoverPanelScreen> {
             _buildHeaderStatus(),
             const SizedBox(height: 24),
             _buildSmartControlsCard(localizations, farmDataProvider),
-            const SizedBox(height: 24),
-            // **STEP 4: Added the new map view card here**
-            _buildMapView(),
           ],
         ),
-      ),
-    );
-  }
-
-  // **STEP 5: New widget to build the map view card**
-  Widget _buildMapView() {
-    return Card(
-      elevation: 4,
-      shadowColor: AppTheme.primaryColor.withOpacity(0.2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      clipBehavior:
-          Clip.antiAlias, // Ensures the map respects the card's rounded corners
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 20, 20, 12),
-            child: Text(
-              "Current Location",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
-          SizedBox(
-            height: 220,
-            child: FlutterMap(
-              options: MapOptions(
-                initialCenter: _roverLocation,
-                initialZoom: 16.0,
-                // Disable map interaction to keep it as a static view
-                interactionOptions: const InteractionOptions(
-                  flags: InteractiveFlag.none,
-                ),
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.example.agrisense',
-                ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: _roverLocation,
-                      width: 80,
-                      height: 80,
-                      child: Icon(
-                        Icons.location_on,
-                        size: 45,
-                        color: Colors.red.shade700,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -177,9 +110,9 @@ class _RoverPanelScreenState extends State<RoverPanelScreen> {
   }
 
   Widget _buildSmartControlsCard(
-    AppLocalizations localizations,
-    FarmDataProvider provider,
-  ) {
+      AppLocalizations localizations,
+      FarmDataProvider provider,
+      ) {
     return Card(
       elevation: 4,
       shadowColor: AppTheme.primaryColor.withOpacity(0.2),

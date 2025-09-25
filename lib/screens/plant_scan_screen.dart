@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:agrisense/models/health_report.dart';
 import 'package:agrisense/models/scan_record.dart';
 import 'package:agrisense/screens/health_report_screen.dart';
 import 'package:agrisense/services/api_service.dart';
@@ -21,32 +20,37 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
   bool _isAnalyzing = false;
 
   Future<void> _pickAndAnalyzeImage(ImageSource source) async {
-    // **THE COMPLETE FIX IS HERE:**
-    // In addition to compressing, we now resize the image. This ensures
-    // the file size is always small and manageable for the API.
     final XFile? pickedFile = await _picker.pickImage(
       source: source,
-      maxWidth: 1024,   // <-- Add this to cap the width
-      maxHeight: 1024,  // <-- Add this to cap the height
-      imageQuality: 70, // <-- Keep compression
+      maxWidth: 1024,
+      maxHeight: 1024,
+      imageQuality: 70,
     );
-
     if (pickedFile == null) return;
     final File imageFile = File(pickedFile.path);
 
     setState(() => _isAnalyzing = true);
 
     try {
-      final Map<String, dynamic> analysisResult = await ApiService.analyzePlant(imageFile);
+      final Map<String, dynamic> analysisResult =
+      await ApiService.analyzePlant(imageFile);
 
-      final suggestions = analysisResult['result']?['disease']?['suggestions'];
+      // **CHANGE 1:** Parse the new combined response structure from the backend.
+      final kindwiseAnalysis = analysisResult['kindwise_analysis'];
+      final pesticideRecommendation = analysisResult['pesticide_recommendation'];
+
+      final suggestions =
+      kindwiseAnalysis['result']?['disease']?['suggestions'];
       final isHealthy = (suggestions == null || suggestions.isEmpty);
 
+      // Create the record for the local database. Note: The recommendation is not saved here.
       final newRecord = ScanRecord()
         ..imagePath = imageFile.path
         ..scanDate = DateTime.now()
-        ..diseaseName = isHealthy ? "Healthy" : suggestions[0]['name']
-        ..probability = isHealthy ? 1.0 : (suggestions[0]['probability'] ?? 0.0);
+        ..diseaseName =
+        isHealthy ? "Healthy" : (suggestions[0]['name'] ?? 'Unknown Disease')
+        ..probability =
+        isHealthy ? 1.0 : (suggestions[0]['probability'] ?? 0.0);
 
       final isar = Isar.getInstance()!;
       await isar.writeTxn(() async {
@@ -54,10 +58,15 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
       });
 
       if (mounted) {
+        // **CHANGE 2:** Pass both the database record AND the new recommendation
+        // to the HealthReportScreen.
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HealthReportScreen(report: newRecord),
+            builder: (context) => HealthReportScreen(
+              report: newRecord,
+              recommendation: pesticideRecommendation,
+            ),
           ),
         );
       }
@@ -94,7 +103,8 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
             const SizedBox(height: 20),
             Text(
               'Analyzing Plant...',
-              style: TextStyle(fontSize: 16, color: AppTheme.subTextColor),
+              style:
+              TextStyle(fontSize: 16, color: AppTheme.subTextColor),
             ),
           ],
         ),
@@ -102,12 +112,10 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
           : Padding(
         padding: const EdgeInsets.all(20.0),
         child: Card(
-          elevation: 2,
-          shadowColor: AppTheme.primaryColor.withOpacity(0.1),
+          elevation: 4,
+          shadowColor: AppTheme.primaryColor.withOpacity(0.2),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: AppTheme.borderColor, width: 1),
-          ),
+              borderRadius: BorderRadius.circular(16)),
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
@@ -116,18 +124,22 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
               children: [
                 Expanded(
                   child: InkWell(
-                    onTap: () => _pickAndAnalyzeImage(ImageSource.camera),
                     borderRadius: BorderRadius.circular(12),
+                    onTap: () => _pickAndAnalyzeImage(ImageSource.camera),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const CircleAvatar(
                           radius: 50,
                           backgroundColor: AppTheme.backgroundColor,
-                          child: Icon(Icons.camera_alt_outlined, size: 50, color: AppTheme.primaryColor),
+                          child: Icon(Icons.camera_alt_outlined,
+                              size: 50, color: AppTheme.primaryColor),
                         ),
                         const SizedBox(height: 16),
-                        Text(localizations.scanWithCamera, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                        Text(localizations.scanWithCamera,
+                            style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
@@ -138,22 +150,25 @@ class _PlantScanScreenState extends State<PlantScanScreen> {
                     children: [
                       const Expanded(child: Divider()),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(localizations.or, style: const TextStyle(color: AppTheme.subTextColor)),
+                        padding:
+                        const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(localizations.or,
+                            style: const TextStyle(
+                                color: AppTheme.subTextColor)),
                       ),
                       const Expanded(child: Divider()),
                     ],
                   ),
                 ),
                 OutlinedButton.icon(
-                  onPressed: () => _pickAndAnalyzeImage(ImageSource.gallery),
+                  onPressed: () =>
+                      _pickAndAnalyzeImage(ImageSource.gallery),
                   icon: const Icon(Icons.photo_library_outlined),
                   label: Text(localizations.uploadFromStorage),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    foregroundColor: AppTheme.primaryColor,
-                    side: const BorderSide(color: AppTheme.borderColor),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
               ],
