@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:agrisense/screens/plant_scan_screen.dart';
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -7,12 +8,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import '../l10n/app_localizations.dart';
 
-// Data model for a single crop
+// Data model for a single crop (for the grid view)
 class Crop {
   final int id;
   bool isHealthy;
   String details;
-
   Crop({required this.id, this.isHealthy = true, required this.details});
 }
 
@@ -37,10 +37,13 @@ class FarmMapScreen extends StatefulWidget {
 class _FarmMapScreenState extends State<FarmMapScreen> {
   // --- State for the Grid View ---
   late List<List<Crop>> _farmData;
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+  TransformationController();
+  // **FIX:** Add a flag to initialize the grid view's position only once.
+  bool _isGridInitialized = false;
 
-  // --- State for the new Map View ---
-  bool _showGridView = false; // Start with the real map view first
+  // --- State for the Map View ---
+  bool _showGridView = false; // Start with the real map view
   bool _isLoadingLocation = true;
   LatLng? _currentLocation;
   String _locationError = '';
@@ -58,7 +61,9 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      if(mounted) setState(() => _locationError = 'Location services are disabled.');
+      if (mounted) {
+        setState(() => _locationError = 'Location services are disabled.');
+      }
       return;
     }
 
@@ -66,18 +71,23 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        if(mounted) setState(() => _locationError = 'Location permissions are denied.');
+        if (mounted) {
+          setState(() => _locationError = 'Location permissions are denied.');
+        }
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      if(mounted) setState(() => _locationError = 'Location permissions are permanently denied.');
+      if (mounted) {
+        setState(() =>
+        _locationError = 'Location permissions are permanently denied.');
+      }
       return;
     }
 
     try {
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      Position position = await Geolocator.getCurrentPosition();
       if (mounted) {
         setState(() {
           _currentLocation = LatLng(position.latitude, position.longitude);
@@ -85,7 +95,9 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
         });
       }
     } catch (e) {
-      if(mounted) setState(() => _locationError = 'Failed to get user location.');
+      if (mounted) {
+        setState(() => _locationError = 'Failed to get user location.');
+      }
     }
   }
 
@@ -98,9 +110,10 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
           int id = rowIndex * widget.plantsPerRow + plantIndex;
           return Crop(
             id: id,
-            details: 'Crop $id - Row: ${rowIndex + 1}, Plant: ${plantIndex + 1}\n'
+            details:
+            'Crop $id - Row: ${rowIndex + 1}, Plant: ${plantIndex + 1}\n'
                 'Type: Wheat\n'
-                'Last Inspected: 2025-09-25\n'
+                'Last Inspected: 2025-09-26\n'
                 'Soil Moisture: 65%\n'
                 'Pest Status: None detected',
           );
@@ -115,7 +128,7 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: localizations.farmMapView,
+        title: "Farm Map",
         hasBackButton: true,
         actions: [
           IconButton(
@@ -138,15 +151,25 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
           children: [
             Expanded(
               child: _isLoadingLocation
-                  ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor))
+                  ? const Center(
+                  child: CircularProgressIndicator(
+                      color: AppTheme.primaryColor))
                   : _locationError.isNotEmpty
-                  ? Center(child: Text(_locationError, style: const TextStyle(color: AppTheme.affectedColor, fontSize: 16), textAlign: TextAlign.center,))
+                  ? Center(
+                  child: Text(_locationError,
+                      style: const TextStyle(
+                          color: AppTheme.affectedColor,
+                          fontSize: 16),
+                      textAlign: TextAlign.center))
                   : _showGridView
-                  ? _buildMapCard() // Your interactive grid view
-                  : _buildFlutterMap(), // The real-world map
+                  ? _buildMapCard() // The interactive grid view
+                  : _buildFlutterMap(), // The real-world map with the rectangle
             ),
-            const SizedBox(height: 20),
-            _buildLegend(localizations),
+            if (_showGridView) // Only show legend for the grid view
+              ...[
+                const SizedBox(height: 20),
+                _buildLegend(localizations),
+              ]
           ],
         ),
       ),
@@ -154,33 +177,95 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
   }
 
   Widget _buildFlutterMap() {
+    const double metersToLatLon = 0.000009;
+    double latOffset;
+    double lngOffset;
+
+    if (widget.farmWidth > widget.farmLength) {
+      latOffset = (widget.farmLength / 2) * metersToLatLon;
+      lngOffset = (widget.farmWidth / 2) * metersToLatLon;
+    } else {
+      latOffset = (widget.farmLength / 2) * metersToLatLon;
+      lngOffset = (widget.farmWidth / 2) * metersToLatLon;
+    }
+
+    final List<LatLng> polygonPoints = [
+      LatLng(_currentLocation!.latitude + latOffset,
+          _currentLocation!.longitude - lngOffset),
+      LatLng(_currentLocation!.latitude + latOffset,
+          _currentLocation!.longitude + lngOffset),
+      LatLng(_currentLocation!.latitude - latOffset,
+          _currentLocation!.longitude + lngOffset),
+      LatLng(_currentLocation!.latitude - latOffset,
+          _currentLocation!.longitude - lngOffset),
+    ];
+
+    final List<CircleMarker> heatmapCircles = [
+      CircleMarker(
+        point: LatLng(_currentLocation!.latitude + latOffset * 0.5,
+            _currentLocation!.longitude - lngOffset * 0.5),
+        radius: 15, useRadiusInMeter: true,
+        color: AppTheme.affectedColor.withOpacity(0.3),
+        borderColor: AppTheme.affectedColor.withOpacity(0.7),
+        borderStrokeWidth: 2,
+      ),
+      CircleMarker(
+        point: LatLng(_currentLocation!.latitude - latOffset * 0.3,
+            _currentLocation!.longitude + lngOffset * 0.6),
+        radius: 20, useRadiusInMeter: true,
+        color: AppTheme.affectedColor.withOpacity(0.3),
+        borderColor: AppTheme.affectedColor.withOpacity(0.7),
+        borderStrokeWidth: 2,
+      ),
+      CircleMarker(
+        point: LatLng(_currentLocation!.latitude,
+            _currentLocation!.longitude + lngOffset * 0.2),
+        radius: 12, useRadiusInMeter: true,
+        color: AppTheme.affectedColor.withOpacity(0.3),
+        borderColor: AppTheme.affectedColor.withOpacity(0.7),
+        borderStrokeWidth: 2,
+      ),
+    ];
+
     return Card(
       elevation: 2,
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: FlutterMap(
         options: MapOptions(
-          initialCenter: _currentLocation ?? const LatLng(13.0827, 80.2707),
+          initialCenter: _currentLocation!,
           initialZoom: 17.0,
+          maxZoom: 19.0,
+          minZoom: 14.0,
         ),
         children: [
           TileLayer(
             urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
             userAgentPackageName: 'com.example.agrisense',
           ),
+          PolygonLayer(
+            polygons: [
+              Polygon(
+                points: polygonPoints,
+                color: AppTheme.primaryColor.withOpacity(0.1),
+                borderColor: AppTheme.primaryColor,
+                borderStrokeWidth: 3,
+              ),
+            ],
+          ),
+          CircleLayer(circles: heatmapCircles),
           MarkerLayer(
             markers: [
-              if (_currentLocation != null)
-                Marker(
-                  point: _currentLocation!,
-                  width: 80,
-                  height: 80,
-                  child: const Icon(
-                    Icons.location_on,
-                    size: 45,
-                    color: Colors.red,
-                  ),
+              Marker(
+                point: _currentLocation!,
+                width: 80,
+                height: 80,
+                child: const Icon(
+                  Icons.my_location,
+                  size: 30,
+                  color: AppTheme.primaryColor,
                 ),
+              ),
             ],
           ),
         ],
@@ -201,6 +286,7 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
     );
   }
 
+  // **FIX:** This widget is now updated to correctly center the grid on first load.
   Widget _buildFarmGrid() {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -208,13 +294,31 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
         double contentWidth = widget.plantsPerRow * (baseCropSize + 4);
         double contentHeight = widget.rows * (baseCropSize + 4);
 
+        // This block runs only once to set the initial centered position.
+        if (!_isGridInitialized) {
+          final double dx = (constraints.maxWidth - contentWidth) / 2;
+          final double dy = (constraints.maxHeight - contentHeight) / 2;
+
+          // Use a post-frame callback to safely update the controller after the build.
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              // Set the initial transformation to center the grid.
+              final initialMatrix = Matrix4.identity()..translate(max(0, dx), max(0, dy));
+              _transformationController.value = initialMatrix;
+              setState(() {
+                _isGridInitialized = true;
+              });
+            }
+          });
+        }
+
         double scaleX = constraints.maxWidth / contentWidth;
         double scaleY = constraints.maxHeight / contentHeight;
         double minScale = min(min(scaleX, scaleY), 1.0);
 
         return InteractiveViewer(
           transformationController: _transformationController,
-          minScale: minScale,
+          minScale: minScale > 0 ? minScale : 0.1, // Ensure minScale is positive
           maxScale: 5.0,
           constrained: false,
           boundaryMargin: const EdgeInsets.all(20.0),
@@ -227,7 +331,7 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
                 widget.rows,
                     (rowIndex) => _FarmRow(
                   crops: _farmData[rowIndex],
-                  onCropTap: (crop) => _showCropDetails(crop),
+                  rowIndex: rowIndex,
                 ),
               ),
             ),
@@ -253,7 +357,9 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
               });
               Navigator.of(dialogContext).pop();
             },
-            child: Text(crop.isHealthy ? localizations.markAffected : localizations.markHealthy),
+            child: Text(crop.isHealthy
+                ? localizations.markAffected
+                : localizations.markHealthy),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
@@ -268,9 +374,12 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _LegendItem(color: AppTheme.healthyColor, label: localizations.healthyPlants),
+        _LegendItem(
+            color: AppTheme.healthyColor, label: localizations.healthyPlants),
         const SizedBox(width: 24),
-        _LegendItem(color: AppTheme.affectedColor, label: localizations.affectedPlants),
+        _LegendItem(
+            color: AppTheme.affectedColor,
+            label: localizations.affectedPlants),
       ],
     );
   }
@@ -278,9 +387,10 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
 
 class _FarmRow extends StatelessWidget {
   final List<Crop> crops;
-  final ValueChanged<Crop> onCropTap;
+  final int rowIndex;
 
-  const _FarmRow({required this.crops, required this.onCropTap});
+  // **FIX:** Removed unused 'onCropTap' and simplified the constructor.
+  const _FarmRow({required this.crops, required this.rowIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -288,15 +398,28 @@ class _FarmRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 2.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: crops.map((crop) {
+        children: crops.asMap().entries.map((entry) {
+          int colIndex = entry.key;
+          Crop crop = entry.value;
           return GestureDetector(
-            onTap: () => onCropTap(crop),
+            onTap: () {
+              // This navigation logic is now the primary action.
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      PlantScanScreen(row: rowIndex + 1, col: colIndex + 1),
+                ),
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2.0),
               child: Icon(
                 Icons.eco,
                 size: 14,
-                color: crop.isHealthy ? AppTheme.healthyColor : AppTheme.affectedColor,
+                color: crop.isHealthy
+                    ? AppTheme.healthyColor
+                    : AppTheme.affectedColor,
               ),
             ),
           );
@@ -323,3 +446,4 @@ class _LegendItem extends StatelessWidget {
     );
   }
 }
+
