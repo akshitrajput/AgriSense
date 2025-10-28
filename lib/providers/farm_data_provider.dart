@@ -3,21 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
+// --- ADD THIS IMPORT ---
+import 'package:mqtt_client/mqtt_client.dart';
+
 class FarmDataProvider with ChangeNotifier {
   FarmData _farmData = FarmData();
   bool _isLoading = true;
   bool _hasOnboarded = false;
 
-  // --- ADDED: State variables for rover controls ---
   bool _isRoverActive = false;
-  bool _isSprinklerActive = false;
+  // bool _isSprinklerActive = false; // REMOVED
+  String _lastStatusMessage = "Initializing...";
 
-  // --- Getters for all properties ---
+  MqttConnectionState _connectionState = MqttConnectionState.disconnected;
+
+  // --- Getters ---
   FarmData get farmData => _farmData;
   bool get isLoading => _isLoading;
   bool get hasOnboarded => _hasOnboarded;
   bool get isRoverActive => _isRoverActive;
-  bool get isSprinklerActive => _isSprinklerActive;
+  // bool get isSprinklerActive => _isSprinklerActive; // REMOVED
+  String get lastStatusMessage => _lastStatusMessage;
+
+  MqttConnectionState get connectionState => _connectionState;
 
   FarmDataProvider() {
     loadFarmData();
@@ -32,9 +40,8 @@ class FarmDataProvider with ChangeNotifier {
       _hasOnboarded = true;
     }
 
-    // Load the last saved state for the toggles
     _isRoverActive = prefs.getBool('is_rover_active') ?? false;
-    _isSprinklerActive = prefs.getBool('is_sprinkler_active') ?? false;
+    // _isSprinklerActive = prefs.getBool('is_sprinkler_active') ?? false; // REMOVED
 
     _isLoading = false;
     notifyListeners();
@@ -51,19 +58,24 @@ class FarmDataProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // --- ADDED: Method to update rover state and save it ---
   Future<void> updateRoverState(bool isActive) async {
-    _isRoverActive = isActive;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_rover_active', isActive);
+    if (_isRoverActive != isActive) {
+      _isRoverActive = isActive;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_rover_active', isActive);
+      notifyListeners();
+    }
+  }
+
+  // --- updateSprinklerState REMOVED ---
+
+  void setLastStatusMessage(String message) {
+    _lastStatusMessage = message;
     notifyListeners();
   }
 
-  // --- ADDED: Method to update sprinkler state and save it ---
-  Future<void> updateSprinklerState(bool isActive) async {
-    _isSprinklerActive = isActive;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_sprinkler_active', isActive);
+  void setConnectionState(MqttConnectionState state) {
+    _connectionState = state;
     notifyListeners();
   }
 
@@ -71,16 +83,16 @@ class FarmDataProvider with ChangeNotifier {
     _farmData = FarmData();
     _hasOnboarded = false;
     _isRoverActive = false;
-    _isSprinklerActive = false;
+    // _isSprinklerActive = false; // REMOVED
+    _lastStatusMessage = "Logged out";
+    _connectionState = MqttConnectionState.disconnected;
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('farm_data');
     await prefs.remove('has_onboarded');
-    // --- ADDED: Clear rover and sprinkler states on logout ---
     await prefs.remove('is_rover_active');
-    await prefs.remove('is_sprinkler_active');
+    // await prefs.remove('is_sprinkler_active'); // REMOVED
 
     notifyListeners();
   }
 }
-

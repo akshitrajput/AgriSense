@@ -12,6 +12,8 @@ import 'package:agrisense/theme/app_theme.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
+import 'package:agrisense/screens/Chatbot_screen.dart';
+// --- END OF ADDED IMPORT ---
 
 // NOTE: The fl_chart import has been removed as it's no longer needed.
 
@@ -67,6 +69,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
+      // --- ADDED THIS WIDGET ---
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            // Assuming your screen's class name is ChatbotScreen
+            MaterialPageRoute(builder: (context) => const ChatBot()),
+          );
+        },
+        backgroundColor: AppTheme.primaryColor,
+        child: const Icon(
+          Icons.chat_bubble_outline,
+          color: Colors.white,
+        ),
+      ),
+      // --- END OF ADDED WIDGET ---
     );
   }
 

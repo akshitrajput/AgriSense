@@ -1,14 +1,11 @@
+// lib/screens/rover_panel_screen.dart
 import 'package:agrisense/providers/farm_data_provider.dart';
+import 'package:agrisense/services/mqtt_service.dart'; // Import the service
 import 'package:agrisense/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:agrisense/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
-
-// ADD MQTT imports
-import 'package:mqtt_client/mqtt_client.dart';
-import 'package:mqtt_client/mqtt_server_client.dart';
-import 'dart:convert';
 
 class RoverPanelScreen extends StatefulWidget {
   const RoverPanelScreen({super.key});
@@ -19,51 +16,13 @@ class RoverPanelScreen extends StatefulWidget {
 
 class _RoverPanelScreenState extends State<RoverPanelScreen> {
   // Dummy data for visual indicators
-  final double _tankCapacity = 0.75; // 75%
+  // final double _tankCapacity = 0.75; // REMOVED
   final double _powerCharge = 0.90; // 90%
-
-  // MQTT client setup
-  late MqttServerClient _client;
-  final String _broker = 'broker.hivemq.com'; // change to your broker
-  final String _topicCmd = 'rover/rover1/cmd';
-  final String _topicStatus = 'rover/rover1/status';
 
   @override
   void initState() {
     super.initState();
-    _connectMQTT();
-  }
-
-  Future<void> _connectMQTT() async {
-    _client = MqttServerClient(_broker, 'flutter_${DateTime.now().millisecondsSinceEpoch}');
-    _client.port = 1883;
-    _client.keepAlivePeriod = 20;
-    _client.logging(on: false);
-
-    _client.onConnected = () => print('✅ Connected to MQTT');
-    _client.onDisconnected = () => print('❌ Disconnected from MQTT');
-
-    try {
-      await _client.connect();
-      _client.subscribe(_topicStatus, MqttQos.atMostOnce);
-
-      _client.updates!.listen((messages) {
-        final recMess = messages[0].payload as MqttPublishMessage;
-        final payload = MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
-        print('📩 Status update: $payload');
-        // TODO: Parse JSON and update FarmDataProvider if needed
-      });
-    } catch (e) {
-      print('⚠️ MQTT error: $e');
-      _client.disconnect();
-    }
-  }
-
-  void _publishCommand(Map<String, dynamic> cmd) {
-    final builder = MqttClientPayloadBuilder();
-    builder.addString(jsonEncode(cmd));
-    _client.publishMessage(_topicCmd, MqttQos.atLeastOnce, builder.payload!);
-    print('➡️ Sent: ${jsonEncode(cmd)}');
+    context.read<MQTTService>().connect();
   }
 
   @override
@@ -98,12 +57,7 @@ class _RoverPanelScreenState extends State<RoverPanelScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildCircularStatusIndicator(
-              icon: Icons.opacity,
-              label: "Sprinkler",
-              value: _tankCapacity,
-              color: Colors.blue.shade400,
-            ),
+            // --- Sprinkler Indicator REMOVED ---
             _buildCircularStatusIndicator(
               icon: Icons.battery_charging_full,
               label: "Battery",
@@ -162,6 +116,8 @@ class _RoverPanelScreenState extends State<RoverPanelScreen> {
       AppLocalizations localizations,
       FarmDataProvider provider,
       ) {
+    final mqttService = context.read<MQTTService>();
+
     return Card(
       elevation: 4,
       shadowColor: AppTheme.primaryColor.withOpacity(0.2),
@@ -181,20 +137,25 @@ class _RoverPanelScreenState extends State<RoverPanelScreen> {
               label: localizations.autonomousRover,
               value: provider.isRoverActive,
               onChanged: (newValue) {
-                provider.updateRoverState(newValue);
-                _publishCommand({"action": newValue ? "start" : "stop"});
+                mqttService.publish(newValue ? "start_bot" : "stop_bot");
               },
             ),
+
+            // --- Sprinkler Toggle and Divider REMOVED ---
+
             const Divider(height: 24),
-            _buildControlToggle(
-              icon: Icons.water_drop_outlined,
-              label: localizations.sprinklerSystem,
-              value: provider.isSprinklerActive,
-              onChanged: (newValue) {
-                provider.updateSprinklerState(newValue);
-                _publishCommand({"action": newValue ? "sprinkler_on" : "sprinkler_off"});
-              },
-            ),
+            Row(
+              children: [
+                Icon(Icons.info_outline, color: AppTheme.subTextColor, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    provider.lastStatusMessage,
+                    style: TextStyle(fontSize: 14, color: AppTheme.subTextColor),
+                  ),
+                ),
+              ],
+            )
           ],
         ),
       ),

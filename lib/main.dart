@@ -11,8 +11,19 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'l10n/app_localizations.dart';
 
+// --- 1. IMPORT flutter_dotenv ---
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+// --- 2. IMPORT THE NEW MQTT SERVICE ---
+import 'package:agrisense/services/mqtt_service.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // --- 3. LOAD the .env file ---
+  await dotenv.load(fileName: ".env");
+
+  // --- Your existing code ---
   final dir = await getApplicationDocumentsDirectory();
   await Isar.open(
     [ScanRecordSchema],
@@ -22,18 +33,31 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   final String? languageCode = prefs.getString('language_code');
 
+  // --- 4. MODIFY THE MultiProvider BLOCK ---
   runApp(
-    // The DevicePreview wrapper has been removed.
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => LanguageProvider(languageCode)),
+        // Your existing LanguageProvider
+        ChangeNotifierProvider(
+            create: (context) => LanguageProvider(languageCode)),
+
+        // Your existing FarmDataProvider
         ChangeNotifierProvider(create: (context) => FarmDataProvider()),
+
+        // --- THIS IS THE FIX ---
+        // We create the MQTTService ONCE using 'Provider' instead of 'ProxyProvider'.
+        // We use 'context.read' to get the FarmDataProvider that was just
+        // created above and pass it to the service.
+        Provider<MQTTService>(
+          create: (context) => MQTTService(context.read<FarmDataProvider>()),
+        ),
       ],
       child: const AgriSenseApp(),
     ),
   );
 }
 
+// --- NO CHANGES NEEDED TO THIS CLASS ---
 class AgriSenseApp extends StatelessWidget {
   const AgriSenseApp({super.key});
 
@@ -42,14 +66,10 @@ class AgriSenseApp extends StatelessWidget {
     return Consumer<LanguageProvider>(
       builder: (context, languageProvider, child) {
         return MaterialApp(
-          // The DevicePreview properties have been removed.
           title: 'AgriSense',
           theme: AppTheme.lightTheme,
           debugShowCheckedModeBanner: false,
-
-          // The locale is now directly controlled by your LanguageProvider.
           locale: languageProvider.appLocale,
-
           supportedLocales: const [
             Locale('en', ''),
             Locale('hi', ''),
@@ -71,7 +91,6 @@ class AgriSenseApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-
           home: const SplashScreen(),
         );
       },
