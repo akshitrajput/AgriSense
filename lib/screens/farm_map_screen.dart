@@ -11,9 +11,11 @@ import '../l10n/app_localizations.dart';
 // Data model for a single crop (for the grid view)
 class Crop {
   final int id;
+  final int row;
+  final int col;
   bool isHealthy;
   String details;
-  Crop({required this.id, this.isHealthy = true, required this.details});
+  Crop({required this.id, required this.row, required this.col, this.isHealthy = true, required this.details});
 }
 
 class FarmMapScreen extends StatefulWidget {
@@ -39,7 +41,6 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
   late List<List<Crop>> _farmData;
   final TransformationController _transformationController =
   TransformationController();
-  // **FIX:** Add a flag to initialize the grid view's position only once.
   bool _isGridInitialized = false;
 
   // --- State for the Map View ---
@@ -61,9 +62,7 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      if (mounted) {
-        setState(() => _locationError = 'Location services are disabled.');
-      }
+      if (mounted) setState(() => _locationError = 'Location services are disabled.');
       return;
     }
 
@@ -71,18 +70,15 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        if (mounted) {
-          setState(() => _locationError = 'Location permissions are denied.');
-        }
+        if (mounted) setState(() => _locationError = 'Location permissions are denied.');
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      if (mounted) {
+      if (mounted)
         setState(() =>
         _locationError = 'Location permissions are permanently denied.');
-      }
       return;
     }
 
@@ -95,9 +91,7 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
         });
       }
     } catch (e) {
-      if (mounted) {
-        setState(() => _locationError = 'Failed to get user location.');
-      }
+      if (mounted) setState(() => _locationError = 'Failed to get user location.');
     }
   }
 
@@ -110,9 +104,9 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
           int id = rowIndex * widget.plantsPerRow + plantIndex;
           return Crop(
             id: id,
-            details:
-            'Crop $id - Row: ${rowIndex + 1}, Plant: ${plantIndex + 1}\n'
-                'Type: Wheat\n'
+            row: rowIndex + 1,
+            col: plantIndex + 1,
+            details: 'Type: Wheat\n'
                 'Last Inspected: 2025-09-26\n'
                 'Soil Moisture: 65%\n'
                 'Pest Status: None detected',
@@ -152,14 +146,13 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
             Expanded(
               child: _isLoadingLocation
                   ? const Center(
-                  child: CircularProgressIndicator(
-                      color: AppTheme.primaryColor))
+                  child:
+                  CircularProgressIndicator(color: AppTheme.primaryColor))
                   : _locationError.isNotEmpty
                   ? Center(
                   child: Text(_locationError,
                       style: const TextStyle(
-                          color: AppTheme.affectedColor,
-                          fontSize: 16),
+                          color: AppTheme.affectedColor, fontSize: 16),
                       textAlign: TextAlign.center))
                   : _showGridView
                   ? _buildMapCard() // The interactive grid view
@@ -286,7 +279,6 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
     );
   }
 
-  // **FIX:** This widget is now updated to correctly center the grid on first load.
   Widget _buildFarmGrid() {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -294,15 +286,12 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
         double contentWidth = widget.plantsPerRow * (baseCropSize + 4);
         double contentHeight = widget.rows * (baseCropSize + 4);
 
-        // This block runs only once to set the initial centered position.
         if (!_isGridInitialized) {
           final double dx = (constraints.maxWidth - contentWidth) / 2;
           final double dy = (constraints.maxHeight - contentHeight) / 2;
 
-          // Use a post-frame callback to safely update the controller after the build.
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
-              // Set the initial transformation to center the grid.
               final initialMatrix = Matrix4.identity()..translate(max(0, dx), max(0, dy));
               _transformationController.value = initialMatrix;
               setState(() {
@@ -318,7 +307,7 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
 
         return InteractiveViewer(
           transformationController: _transformationController,
-          minScale: minScale > 0 ? minScale : 0.1, // Ensure minScale is positive
+          minScale: minScale > 0 ? minScale : 0.1,
           maxScale: 5.0,
           constrained: false,
           boundaryMargin: const EdgeInsets.all(20.0),
@@ -331,7 +320,8 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
                 widget.rows,
                     (rowIndex) => _FarmRow(
                   crops: _farmData[rowIndex],
-                  rowIndex: rowIndex,
+                  // **FIX:** Pass the _showCropDetails method to the row.
+                  onCropTap: _showCropDetails,
                 ),
               ),
             ),
@@ -341,13 +331,37 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
     );
   }
 
+  // **FIX:** This function is now called when a crop is tapped.
   void _showCropDetails(Crop crop) {
     final localizations = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text('${localizations.cropDetailsTitle} - ID: ${crop.id}'),
-        content: Text(crop.details),
+        title: Text('${localizations.cropDetailsTitle} - R${crop.row}, C${crop.col}'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(crop.details),
+            const SizedBox(height: 16),
+            // **NEW:** A button inside the dialog to initiate a scan for this specific plant.
+            Center(
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.camera_alt_outlined),
+                label: const Text("Scan this Plant"),
+                onPressed: () {
+                  Navigator.of(dialogContext).pop(); // Close the dialog first
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PlantScanScreen(row: crop.row, col: crop.col),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         actions: [
           TextButton(
@@ -387,10 +401,10 @@ class _FarmMapScreenState extends State<FarmMapScreen> {
 
 class _FarmRow extends StatelessWidget {
   final List<Crop> crops;
-  final int rowIndex;
+  // **FIX:** The row now accepts the onCropTap callback.
+  final ValueChanged<Crop> onCropTap;
 
-  // **FIX:** Removed unused 'onCropTap' and simplified the constructor.
-  const _FarmRow({required this.crops, required this.rowIndex});
+  const _FarmRow({required this.crops, required this.onCropTap});
 
   @override
   Widget build(BuildContext context) {
@@ -398,20 +412,10 @@ class _FarmRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 2.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: crops.asMap().entries.map((entry) {
-          int colIndex = entry.key;
-          Crop crop = entry.value;
+        children: crops.map((crop) {
           return GestureDetector(
-            onTap: () {
-              // This navigation logic is now the primary action.
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      PlantScanScreen(row: rowIndex + 1, col: colIndex + 1),
-                ),
-              );
-            },
+            // **FIX:** The onTap action now calls the provided callback.
+            onTap: () => onCropTap(crop),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2.0),
               child: Icon(

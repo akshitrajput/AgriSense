@@ -51,6 +51,7 @@ dependencies:
   flutter_map: ^8.2.2
   latlong2: ^0.9.1
   open_file: ^3.3.2    # Or latest version
+  mqtt_client: ^9.6.0
 
 dev_dependencies:
   flutter_test:

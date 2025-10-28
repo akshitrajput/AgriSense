@@ -23,6 +23,7 @@ Future<void> main() async {
   final String? languageCode = prefs.getString('language_code');
 
   runApp(
+    // The DevicePreview wrapper has been removed.
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => LanguageProvider(languageCode)),
@@ -41,9 +42,12 @@ class AgriSenseApp extends StatelessWidget {
     return Consumer<LanguageProvider>(
       builder: (context, languageProvider, child) {
         return MaterialApp(
+          // The DevicePreview properties have been removed.
           title: 'AgriSense',
           theme: AppTheme.lightTheme,
           debugShowCheckedModeBanner: false,
+
+          // The locale is now directly controlled by your LanguageProvider.
           locale: languageProvider.appLocale,
 
           supportedLocales: const [
@@ -67,7 +71,7 @@ class AgriSenseApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          
+
           home: const SplashScreen(),
         );
       },
